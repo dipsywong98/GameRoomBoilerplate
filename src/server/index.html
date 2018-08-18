@@ -1,0 +1,33 @@
+<html>
+<head>
+  <title>Chat Room</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.slim.js"></script>
+</head>
+ <body>
+  <h2>Simple Chat Room</h2>
+  <input id="new_message"><button onclick="sendMessage()">Send</button>
+  <div id="all_messages"></div>
+</body>
+ <script>
+  //connect the socket of server
+  //in case the socket server is at another location, use: socket = io.connect(url_to_socket_server)
+  let socket = io()
+   //when there is incoming message in server channel, alert the data
+  socket.on('server', (data) => {
+    window.alert(data)
+  })
+   //when there is message in chatRoom channel, append the message to the website
+  socket.on('chatRoom', (data) => {
+    console.log(data)
+    let p = document.createElement('p')
+    p.innerText = data
+    document.getElementById('all_messages').appendChild(p)
+  })
+   //this is a function to handle the button click action, which send the message to server
+  function sendMessage(){
+    const message = document.getElementById('new_message').value
+    socket.emit('chatRoom',message)
+  }
+  
+</script>
+ </html>
