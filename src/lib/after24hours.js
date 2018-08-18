@@ -1,0 +1,1 @@
+export default () => Date.now() + 3600*1000*24

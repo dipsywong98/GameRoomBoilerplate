@@ -11,6 +11,8 @@ Base on that, a game with gameroom can be easily created.
 1. react
 2. react-redux
 3. socket.io-client
+4. react-ga (google-analytics)
+5. @material-ui/core
 
 ## How to Use
 
