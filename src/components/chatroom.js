@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Grid, List, ListItem, ListItemText, Input, Paper, Button, Collapse, IconButton } from '@material-ui/core'
 import { withStyles } from '@material-ui/core/styles'
-import { dbon, dbupdate, dbset, dboff } from '../lib/init-firebase'
+import socket from '../lib/socket-client-helper'
 import Send from './svg/send'
 import Chip from './chatroom-chip'
 
@@ -36,13 +36,19 @@ class ChatRoom extends Component {
     oldIsr: null,
     focus: false
   }
+  onReceiveMessage = (message)=>{
+    const {messages} = this.state
+    messages.push(message)
+    this.setState({messages})
+  }
   componentWillMount() {
     const { channel } = this.props
     console.log(`subsribe to ${channel}`)
-    dbon(`rooms/${channel}/chat`, 'value', value => this.setState({
-      messages: value && value.messages && value.messages.sort((a,b)=>a.time-b.time) || [],
-      cursor: value && value.cursor || 0
-    }))
+    socket.on(`chatRoom/lobby`, this.onReceiveMessage)
+    // dbon(`rooms/${channel}/chat`, 'value', value => this.setState({
+    //   messages: value && value.messages && value.messages.sort((a,b)=>a.time-b.time) || [],
+    //   cursor: value && value.cursor || 0
+    // }))
     this.state.oldIsr = window.onkeyup
     window.onkeyup = e => {
       const key = e.keyCode ? e.keyCode : e.which
@@ -51,15 +57,13 @@ class ChatRoom extends Component {
   }
   componentWillUnmount() {
     window.onkeyup = this.state.oldIsr
-    dboff(`rooms/${this.props.channel}/chat`, 'value')
+    // dboff(`rooms/${this.props.channel}/chat`, 'value')
+    socket.removeAllListeners(`chatRoom/lobby`)
   }
   componentWillReceiveProps(nextProps) {
-    dboff(`rooms/${this.props.channel}/chat`, 'value')
+    socket.removeAllListeners(`rooms/${this.props.channel}/chat`)
     console.log(`unsubsribe to ${this.props.channel} and subscribe to ${nextProps.channel}`)
-    dbon(`rooms/${nextProps.channel}/chat`, 'value', value => this.setState({
-      messages: value && value.messages && value.messages.sort((a,b)=>a.time-b.time) || [],
-      cursor: value && value.cursor || 0
-    }))
+    socket.on(`rooms/${nextProps.channel}/chat`, this.onReceiveMessage)
   }
   
   handleInput = ({ target: { value } }) => {
@@ -71,9 +75,7 @@ class ChatRoom extends Component {
     if(message === '') return
     const newMessage = { time: Date.now(), name, message }
     this.setState({ message: '' })
-    dbset(`rooms/${channel}/chat/messages/${cursor++%50}`, newMessage)
-    dbset(`rooms/${channel}/chat/cursor`,cursor)
-    this.setState({cursor})
+    socket.emit(`chatRoom/lobby`, newMessage)
   }
   render() {
     const { classes, name } = this.props

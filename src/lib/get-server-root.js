@@ -1,0 +1,1 @@
+export default ()=>window.location.href.indexOf('localhost')!==-1?'http://localhost':window.location.href
