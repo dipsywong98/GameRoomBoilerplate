@@ -1,23 +1,28 @@
 import React,{Component} from 'react'
 import request from 'request'
-import {on, emit} from '../lib/socket-client-helper'
+import socket from '../lib/socket-client-helper'
 import withPlayer from '../lib/with-player'
 import ChatRoom from './chatroom'
 import root from '../lib/get-server-root'
  class Lobby extends Component {
    state={
      roomName:'',
-     rooms:[]
+     rooms:{}
    }
   constructor(props){
     super(props)
     request.get(root()+'/gamerooms',(err,httpResponse,body)=>{
       console.log({err,httpResponse,body})
       if(httpResponse.statusCode===200){
-        this.setState({rooms:Object.values(JSON.parse(body))})
+        this.setState({rooms:JSON.parse(body)})
       }else{
         window.alert(body)
       }
+    })
+    socket.on('lobby',(room)=>{
+      const {rooms} = this.state
+      rooms[room.name] = room
+      this.setState({rooms})
     })
   }
   requestCreateRoom = ()=>{
@@ -52,14 +57,11 @@ import root from '../lib/get-server-root'
     return (
       <div>
         <button onClick={()=>this.props.changeState(0)}>Back</button>
-        {/* {this.state.msgs.map((msg,k)=><p key={k}>{msg}</p>)}
-    <input value={this.state.newmsg} onChange={({ target: { value } })=>this.setState({newmsg:value})}/>
-        <button onClick={()=>emit('chatRoom',this.state.newmsg)&&this.setState({newmsg:''})}>Send</button> */}
         <input onChange={({target:{value:roomName}})=>this.setState({roomName})}/>
         <button onClick={this.requestCreateRoom}>Create Room</button>
-        {this.state.rooms.map(room=>(
+        {Object.values(this.state.rooms).map(room=>(
           <div>
-            <button onClick={()=>this.requestJoinRoom(room)} key={room.name}>{room.name}</button>
+            <button onClick={()=>this.requestJoinRoom(room)} key={room.name}>{room.name}{room.players.length}</button>
           </div>
         ))}
         <ChatRoom channel="lobby" name={this.props.player.name}></ChatRoom>

@@ -47,12 +47,14 @@ class GameRooms {
       created: Date.now()
     }
     if (newRoom.name in this.rooms) throw 'room already exists'
+    this.io.emit('lobby',newRoom)
     return this.rooms[newRoom.name] = newRoom
   }
   joinRoom(player, roomName) {
     if (roomName in this.rooms) {
       const room = this.rooms[roomName]
       room.players.push(player)
+      this.io.emit('lobby',room)
       return room
     } else throw 'no such game room'
   }
