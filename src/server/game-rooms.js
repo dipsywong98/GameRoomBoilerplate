@@ -31,8 +31,9 @@ class GameRooms {
       }
     })
     app.post('/gamerooms/:roomName', (req, res) => {
+      console.log(req.params.roomName)
       try {
-        res.send(this.joinRoom(req.body.player, req.body.roomName))
+        res.send(this.joinRoom(req.body.player, req.params.roomName))
       } catch (error) {
         res.status(409)
         res.send({ error })
