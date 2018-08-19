@@ -14,6 +14,8 @@ import after24hours from '../lib/after24hours'
 import randInt from '../lib/rand-int'
 import {connect} from 'react-redux'
 
+console.log(process.env.SERVER)
+
 const styles = theme => ({
   root: {
     textAlign: 'center',
@@ -104,6 +106,9 @@ class Home extends Component {
           </Grid>
           <Grid style={{ marginTop: '32px' }} item>
             <LastUpdate repo='dipsywong98/SpyFall' />
+          </Grid>
+          <Grid style={{ marginTop: '32px' }} item>
+            hi{process.env.SERVER}
           </Grid>
         </Grid>
       </div>
