@@ -1,6 +1,6 @@
 import io from 'socket.io-client'
 
-const socket = io('http://localhost:80')
+const socket = io(window.location.href.indexOf('localhost')!==-1?'http://localhost:80':'')
 
 const subscribe = (channel, callback) => socket.on(channel,callback)
 
