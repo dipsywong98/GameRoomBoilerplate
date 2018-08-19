@@ -2,7 +2,9 @@ var app = require('express')();
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-server.listen(80);
+const port = process.env.PORT || 80
+
+server.listen(port);
 // WARNING: app.listen(80) will NOT work here!
 
 app.get('/', function (req, res) {
@@ -24,4 +26,4 @@ io.sockets.on('connection', function (socket) {
  })
 })
 
-console.log('listening on port 80')
+console.log('listening on port '+port)

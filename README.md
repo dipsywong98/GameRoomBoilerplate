@@ -43,7 +43,10 @@ static stuffs should be put inside `./public/`
 You may directly uses two server to host client and server, which is totally fine.
 If you want to keep it one, you need to bundle the client side by:
 ```bash
-npm build
+npm run build
 ```
 Then you can access the client side through the server
+```bash
+npm start
+```
 
