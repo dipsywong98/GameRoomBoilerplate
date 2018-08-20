@@ -11,7 +11,8 @@ app.all('/*', function(req, res, next) {
   res.header('Content-Type: application/json; charset=utf-8')
   next();
  });
-const gamerooms = require('./src/server/game-rooms')(app,io)
+ const clients = require('./src/server/clients')()
+ const gamerooms = require('./src/server/game-rooms')(app,io,clients)
 
 const port = process.env.PORT || 80
 
@@ -28,12 +29,9 @@ app.get('*.*',function(req,res){
 })
 
 io.sockets.on('connection', function (socket) {
-  //socket is the newly connected client, say hello to him through 'server' channel
- socket.emit('server', 'welcome to simple chat room')
-  //when the new client emit data through client 
+  clients.newClient(socket)
  socket.on('chatRoom/lobby', function (data) {
    console.log(data)
-    //boardcast the data to all clients(io.sockets) through client channel
    io.sockets.emit('chatRoom', data)
  })
 })

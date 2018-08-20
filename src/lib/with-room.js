@@ -1,11 +1,10 @@
 import { connect } from 'react-redux'
-import { joinRoom, updateRoom } from './store'
+import { setRoom } from './store'
 
 const mapStateToProps = ({ room }) => ({ room })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
-  joinRoom: (...args) => dispatch(joinRoom(...args)),
-  updateRoom: (...args) => dispatch(updateRoom(...args))
+  setRoom: (...args) => dispatch(setRoom(...args))
 })
 
 const withRoom = WrapComponent => {

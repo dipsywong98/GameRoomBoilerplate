@@ -1,18 +1,22 @@
+const GameRoom = require('./game-room')
+const Clients = require('./clients')
+
 class GameRooms {
-  constructor(app, io) {
+  constructor(app, io, clients) {
     this.app = app
     this.io = io
     this.rooms = {}
+    console.log(clients)
     app.get('/gamerooms', (req, res) => {
-      res.send(this.rooms)
+      res.send(Object.values(this.rooms).reduce((obj,room)=>({...obj,[room.name]:room.data()}),{}))
     })
     app.get('/gamerooms/:id', (req, res) => {
       const id = req.params.id
       if (id in this.rooms) {
-        res.send(this.rooms[id])
+        res.send(this.rooms[id].data())
       } else {
-        res.send({ message: 'no such gameroom' })
         res.status(404)
+        res.send({ message: 'no such gameroom' })
       }
     })
     app.post('/gamerooms', (req, res) => {
@@ -22,8 +26,9 @@ class GameRooms {
         res.send({ error: 'player is a required field' })
       } else {
         try {
-          const room = this.createRoom(req.body.player, req.body.options)
-          res.send(room)
+          const player = clients.clients[req.body.player.id]
+          const room = this.createRoom(player, req.body.options)
+          res.send(room.data())
         } catch (error) {
           res.status(409)
           res.send({ error })
@@ -33,7 +38,8 @@ class GameRooms {
     app.post('/gamerooms/:roomName', (req, res) => {
       console.log(req.params.roomName)
       try {
-        res.send(this.joinRoom(req.body.player, req.params.roomName))
+        const player = clients.clients[req.body.player.id]
+        res.send(this.joinRoom(player, req.params.roomName).data())
       } catch (error) {
         res.status(409)
         res.send({ error })
@@ -41,25 +47,22 @@ class GameRooms {
     })
   }
   createRoom(player, options = {}) {
-    const newRoom = {
-      name: options.name || player.name,
-      players: [player],
-      created: Date.now()
-    }
+    const newRoom = new GameRoom(options.name || player.name)
     if (newRoom.name in this.rooms) throw 'room already exists'
-    this.io.emit('lobby',newRoom)
+    newRoom.addPlayer(player)
+    this.io.emit('lobby',newRoom.data())
     return this.rooms[newRoom.name] = newRoom
   }
   joinRoom(player, roomName) {
     if (roomName in this.rooms) {
       const room = this.rooms[roomName]
-      room.players.push(player)
-      this.io.emit('lobby',room)
+      room.addPlayer(player)
+      this.io.emit('lobby',room.data())
       return room
     } else throw 'no such game room'
   }
 }
 
-const init = (app, io) => new GameRooms(app, io)
+const init = (app, io, clients) => new GameRooms(app, io, clients)
 
 module.exports = init

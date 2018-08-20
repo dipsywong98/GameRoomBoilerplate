@@ -2,6 +2,7 @@ import React,{Component} from 'react'
 import request from 'request'
 import socket from '../lib/socket-client-helper'
 import withPlayer from '../lib/with-player'
+import withRoom from '../lib/with-room'
 import ChatRoom from './chatroom'
 import root from '../lib/get-server-root'
  class Lobby extends Component {
@@ -24,6 +25,9 @@ import root from '../lib/get-server-root'
       rooms[room.name] = room
       this.setState({rooms})
     })
+  }
+  componentWillUnmount(){
+    socket.removeAllListeners('lobby')
   }
   requestCreateRoom = ()=>{
     const {roomName:name} = this.state
@@ -49,7 +53,8 @@ import root from '../lib/get-server-root'
   }
   onJoinRoom = (room) => {
     console.log('successfully joined room', room)
-    this.props.setPlayer({room})
+    this.props.setPlayer({room:room.name})
+    this.props.setRoom(room)
     this.props.changeState(2)
   }
   render(){
@@ -69,4 +74,4 @@ import root from '../lib/get-server-root'
     )
   }
 }
- export default withPlayer(Lobby)
+ export default withRoom(withPlayer(Lobby))
