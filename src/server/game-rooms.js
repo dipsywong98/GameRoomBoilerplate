@@ -47,7 +47,7 @@ class GameRooms {
     })
   }
   createRoom(player, options = {}) {
-    const newRoom = new GameRoom(options.name || player.name)
+    const newRoom = new GameRoom(options.name || player.name, this)
     if (newRoom.name in this.rooms) throw 'room already exists'
     newRoom.addPlayer(player)
     this.io.emit('lobby',newRoom.data())
@@ -60,6 +60,10 @@ class GameRooms {
       this.io.emit('lobby',room.data())
       return room
     } else throw 'no such game room'
+  }
+  removeRoom(room){
+    this.io.emit('lobby',{name:room.name,deleted:true})
+    delete this.rooms[room.name]
   }
 }
 

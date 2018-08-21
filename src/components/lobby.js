@@ -23,6 +23,9 @@ import root from '../lib/get-server-root'
     socket.on('lobby',(room)=>{
       const {rooms} = this.state
       rooms[room.name] = room
+      if(room.deleted){
+        delete rooms[room.name]
+      }
       this.setState({rooms})
     })
   }

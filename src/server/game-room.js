@@ -1,5 +1,6 @@
 class GameRoom{
-  constructor(name){
+  constructor(name,gamerooms){
+    this.gamerooms = gamerooms
     this.name = name
     this.created = Date.now()
     this.players = {}
@@ -16,8 +17,13 @@ class GameRoom{
     player.room = undefined
     player.emit('player',player.data())
     player.emit('room',undefined)
+    player.removeAllListeners('room')
     console.log('removeplayer',this)
     this.socketsEmit('room',this.data())
+    this.gamerooms.io.emit('lobby',this.data())
+    if(Object.keys(this.players).length === 0){
+      this.gamerooms.removeRoom(this)
+    }
   }
   socketsOn(channel, callback){
     this.subscritions.push({channel, callback})
