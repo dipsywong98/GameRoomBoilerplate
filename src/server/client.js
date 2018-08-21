@@ -1,40 +1,39 @@
 class Client{
   constructor(socket, clients){
+    console.log('client.js',clients)
+    this.state = {id:socket.id}
     this.socket = socket
     this.clients = clients
-    this.id = socket.id
     socket.on('player',player=>{
       console.log('player',player)
-      this.name=player.name
-      if(!player.room&&!!this.room)this.leaveRoom(this.room)
-      this.room=player.room
+      this.state = {...this.state, ...player}
+      if(!player.room&&!!this.room)this.room.removePlayer(this)
     })
+    this.on('disconnect',this.onDisconnect)
   }
-  joinRoom(room){
-    try{
-      room.addPlayer(this)
-      this.on('disconnect',this.leaveRoom)
-    }catch(e){
-      this.emit('alert',e)
+  setState(newState){
+    this.emit('player',newState)
+    this.state = {...this.state,...newState}
+  }
+  onDisconnect = ()=>{
+    console.log("disconnect",this.state.id)
+    if(this.room){
+      this.room.removePlayer(this)
     }
-  }
-  leaveRoom(room){
-    room.players[this.id]=undefined
-    this.removeAllListeners('disconnect')
+    this.clients.clients[this.id] = undefined
   }
   on = (channel, action) => {
     this.socket.on(channel,action)
   }
   emit = (channel, signal) => {
-    this.socket.emit(channel, signel)
+    this.socket.emit(channel, signal)
   }
   removeAllListeners = channel => {
     this.socket.removeAllListeners(channel)
   }
   data(){return{
-    id:this.id,
-    name:this.name,
-    // room:this.room
+    id:this.state.id,
+    name:this.state.name
   }}
 }
 

@@ -4,7 +4,7 @@ class Clients{
   constructor(){
     this.clients = {}
   }
-  newClient(socket){
+  newClient=(socket)=>{
     this.clients[socket.id] = new Client(socket,this)
   }
   data(){

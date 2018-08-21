@@ -1,30 +1,48 @@
-function GameRoom(name) {
-  this.name = name
-  this.created = Date.now()
-  this.players = {}
-  this.addPlayer = function (player) {
-    this.players[player.id] = player
+class GameRoom{
+  constructor(name){
+    this.state = {name,created:Date.now(),players:{}}
+    console.log(this.state)
+    this.dataCache = {}
+    this.subscritions = []
+  }
+  setState(newState){
+    this.state = {...this.state,...newState}
+    this.dataCache = this.data()
+    console.log(this.dataCache)
+    this.socketsEmit('room',this.dataCache)
+  }
+  addPlayer(player){
+    this.state.players[player.state.id] = player
+    this.setState(this.state.players)
     player.room = this
+    this.socketsEmit('room',this.data())
+    this.subscritions.forEach(({channel,callback})=>player.on(channel,callback))
   }
-  this.removePlayer = function (player) {
-    this.players[player.name] = undefined
+  removePlayer(player){
+    this.state.players[player.state.name] = undefined
+    this.setState(this.state.players)
+    player.setState({room:undefined})
+    player.emit('room',{})
+    this.socketsEmit('room',this.data())
   }
-  this.socketsOn = function (channel, callback) {
-    Object.values(this.players).forEach(({ socket }) => socket.on(channel, callback))
+  socketsOn(channel, callback){
+    this.subscritions.push({channel, callback})
+    Object.values(this.state.players).forEach(({socket})=>socket.on(channel,callback))
   }
-  this.socketsEmit = function (channel, ...params) {
-    Object.values(this.players).forEach(({ socket }) => socket.emit(channel, ...params))
+  socketsEmit(channel,...params){
+    Object.values(this.state.players).forEach(({socket})=>socket.emit(channel,...params))
   }
-  this.socketsRemoveAllListeners = channel => {
-    Object.values(this.players).forEach(({ socket }) => socket.removeAllListeners(channel))
+  socketsRemoveAllListeners = channel => {
+    this.subscritions = this.subscritions.filter(({channel:ch})=>channel!=ch)
+    Object.values(this.state.players).forEach(({socket})=>socket.removeAllListeners(channel))
   }
-  this.data = function () {
-    return ({
-      name: this.name,
-      created: this.created,
-      players: Object.values(this.players).map(player => player.data())
-    })
-  }
+  data(){
+    console.log('this.state.players',this.state.players)
+    return{
+    name:this.state.name,
+    created:this.state.created,
+    players:Object.values(this.state.players).map(player=>player.data())
+  }}
 }
 
 module.exports = GameRoom
