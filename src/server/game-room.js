@@ -1,47 +1,41 @@
 class GameRoom{
   constructor(name){
-    this.state = {name,created:Date.now(),players:{}}
-    console.log(this.state)
-    this.dataCache = {}
+    this.name = name
+    this.created = Date.now()
+    this.players = {}
     this.subscritions = []
   }
-  setState(newState){
-    this.state = {...this.state,...newState}
-    this.dataCache = this.data()
-    console.log(this.dataCache)
-    this.socketsEmit('room',this.dataCache)
-  }
   addPlayer(player){
-    this.state.players[player.state.id] = player
-    this.setState(this.state.players)
+    this.players[player.id] = player
     player.room = this
     this.socketsEmit('room',this.data())
     this.subscritions.forEach(({channel,callback})=>player.on(channel,callback))
   }
   removePlayer(player){
-    this.state.players[player.state.name] = undefined
-    this.setState(this.state.players)
-    player.setState({room:undefined})
-    player.emit('room',{})
+    delete this.players[player.id]
+    player.room = undefined
+    player.emit('player',player.data())
+    player.emit('room',undefined)
+    console.log('removeplayer',this)
     this.socketsEmit('room',this.data())
   }
   socketsOn(channel, callback){
     this.subscritions.push({channel, callback})
-    Object.values(this.state.players).forEach(({socket})=>socket.on(channel,callback))
+    Object.values(this.players).forEach(({socket})=>socket.on(channel,callback))
   }
   socketsEmit(channel,...params){
-    Object.values(this.state.players).forEach(({socket})=>socket.emit(channel,...params))
+    Object.values(this.players).forEach(({socket})=>socket.emit(channel,...params))
   }
-  socketsRemoveAllListeners = channel => {
+  socketsRemoveAllListeners (channel) {
     this.subscritions = this.subscritions.filter(({channel:ch})=>channel!=ch)
-    Object.values(this.state.players).forEach(({socket})=>socket.removeAllListeners(channel))
+    Object.values(this.players).forEach(({socket})=>socket.removeAllListeners(channel))
   }
   data(){
-    console.log('this.state.players',this.state.players)
+    console.log(this.players)
     return{
-    name:this.state.name,
-    created:this.state.created,
-    players:Object.values(this.state.players).map(player=>player.data())
+    name:this.name,
+    created:this.created,
+    players:Object.values(this.players).map(player=>player.data())
   }}
 }
 

@@ -23,7 +23,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "server": "nodemon --exec babel-node index.js",
+    "babel-server": "nodemon --exec babel-node index.js",
+    "server":"nodemon index.js",
     "client": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",

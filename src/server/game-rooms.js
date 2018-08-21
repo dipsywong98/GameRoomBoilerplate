@@ -30,7 +30,6 @@ class GameRooms {
           const room = this.createRoom(player, req.body.options)
           res.send(room.data())
         } catch (error) {
-          console.log(error)
           res.status(409)
           res.send({ error })
         }
@@ -42,18 +41,17 @@ class GameRooms {
         const player = clients.clients[req.body.player.id]
         res.send(this.joinRoom(player, req.params.roomName).data())
       } catch (error) {
-        console.log(error)
         res.status(409)
         res.send({ error })
       }
     })
   }
   createRoom(player, options = {}) {
-    const newRoom = new GameRoom(options.name || player.state.name)
+    const newRoom = new GameRoom(options.name || player.name)
     if (newRoom.name in this.rooms) throw 'room already exists'
     newRoom.addPlayer(player)
     this.io.emit('lobby',newRoom.data())
-    return this.rooms[newRoom.state.name] = newRoom
+    return this.rooms[newRoom.name] = newRoom
   }
   joinRoom(player, roomName) {
     if (roomName in this.rooms) {
