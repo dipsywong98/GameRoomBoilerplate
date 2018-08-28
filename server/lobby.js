@@ -1,3 +1,5 @@
+const {playerSocket} = require('./helpers')
+
 const init = (app, io)=>{
   this.app = app
   this.io = io
@@ -37,14 +39,15 @@ const init = (app, io)=>{
 }
 
 const createRoom = (player, options) => {
+  const name = options.name || player.name
+  if (name in this.rooms) throw 'room already exists'
   const newRoom = {
-    name: options.name || player.name,
-    players: {[player.id]:player.name},
+    name ,
+    players: {},
     created: Date.now()
   }
-  if (newRoom.name in this.rooms) throw 'room already exists'
-  this.io.emit('lobby',newRoom)
-  return this.rooms[newRoom.name] = newRoom
+  this.rooms[newRoom.name] = newRoom
+  return joinRoom(player,name)
 }
 
 const joinRoom = (player, roomName) => {
@@ -52,8 +55,24 @@ const joinRoom = (player, roomName) => {
     const room = this.rooms[roomName]
     room.players[player.id]=player.name
     this.io.emit('lobby',room)
+    playerSocket(this.io,player).on('disconnect',()=>leaveRoom(player,roomName))
     return room
   } else throw 'no such game room'
+}
+
+const leaveRoom = (player, roomName) => {
+  const {players} = this.rooms[roomName]
+  delete players[player.id]
+  if(Object.keys(players).length === 0){
+    removeRoom(roomName)
+  }else{
+    this.io.emit(this.rooms[roomName])
+  }
+}
+
+const removeRoom = (roomName) => {
+  delete this.rooms[roomName]
+  this.io.emit({name:roomName,deleted:true})
 }
 
 exports.log = ()=>console.log(this.text)

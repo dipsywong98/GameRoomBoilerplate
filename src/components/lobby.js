@@ -58,7 +58,7 @@ import root from '../lib/get-server-root'
     console.log('successfully joined room', room)
     this.props.setPlayer({room:room.name})
     this.props.setRoom(room)
-    this.props.changeState(2)
+    // this.props.changeState(2)
   }
   render(){
     console.log(this.state.rooms)
@@ -69,7 +69,7 @@ import root from '../lib/get-server-root'
         <button onClick={this.requestCreateRoom}>Create Room</button>
         {Object.values(this.state.rooms).map(room=>(
           <div>
-            <button onClick={()=>this.requestJoinRoom(room)} key={room.name}>{room.name}{room.players.length}</button>
+            <button onClick={()=>this.requestJoinRoom(room)} key={room.name}>{room.name}{Object.keys(room.players).length}</button>
           </div>
         ))}
         <ChatRoom channel="lobby" name={this.props.player.name}></ChatRoom>
