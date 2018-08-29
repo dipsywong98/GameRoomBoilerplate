@@ -35,13 +35,7 @@ import root from '../lib/get-server-root'
   requestCreateRoom = ()=>{
     const {roomName:name} = this.state
     const {player}=this.props
-    request.post(root()+'/gamerooms',{form:{player,options:{name}}},(err,httpResponse,body)=>{
-      if(httpResponse.statusCode===200){
-        this.onJoinRoom(JSON.parse(body))
-      }else{
-        window.alert(body)
-      }
-    })
+    socket.emit('createRoom',{name})
   }
   requestJoinRoom = (room) => {
     const {player} = this.props

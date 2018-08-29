@@ -12,17 +12,15 @@ app.all('/*', function (req, res, next) {
   next();
 });
 
-const lobby = require('./server/lobby')(app,io)
-// lobby.init(app,io)
+const lobby = require('./server/lobby')
+lobby.init(app,io)
 lobby.log()
 
-// const clients = require('./src/server/clients')()
-// const gamerooms = require('./src/server/game-rooms')(app, io, clients)
+const clients = require('./server/clients')(lobby)
 
 const port = process.env.PORT || 80
 
 server.listen(port);
-// WARNING: app.listen(80) will NOT work here!
 
 
 app.get('/', function (req, res) {
@@ -34,7 +32,7 @@ app.get('*.*', function (req, res) {
 })
 
 io.sockets.on('connection', function (socket) {
-  // clients.newClient(socket)
+  clients.newClient(socket)
   socket.on('chatRoom/lobby', function (data) {
     console.log(data)
     io.sockets.emit('chatRoom', data)
