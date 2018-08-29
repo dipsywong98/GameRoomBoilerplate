@@ -28,24 +28,26 @@ const joinRoom = (player, roomName) => {
     const room = this.rooms[roomName]
     room.players[player.id] = player.name
     this.io.emit('lobby', room)
-    playerSocket(this.io, player).on('disconnect', () => leaveRoom(player, roomName))
     return room
   } else throw 'no such game room'
 }
 
-const leaveRoom = (player, roomName) => {
+const leaveRoom = (player) => {
+  let roomName = ''
+  if(!('roomName' in player)||((roomName = player.roomName)===''))return console.log('player dont belongs to room')
+  if(!(roomName in this.rooms))return console.log('room '+roomName+' does not exist')
   const { players } = this.rooms[roomName]
   delete players[player.id]
   if (Object.keys(players).length === 0) {
     removeRoom(roomName)
   } else {
-    this.io.emit(this.rooms[roomName])
+    this.io.emit('lobby',this.rooms[roomName])
   }
 }
 
 const removeRoom = (roomName) => {
   delete this.rooms[roomName]
-  this.io.emit({ name: roomName, deleted: true })
+  this.io.emit('lobby',{ name: roomName, deleted: true })
 }
 
 exports.log = () => console.log(this.text)

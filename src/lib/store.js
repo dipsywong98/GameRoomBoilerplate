@@ -1,7 +1,7 @@
 import { createStore } from 'redux'
 import socket from './socket-client-helper'
 
-const reducer = (state = { lang: 'en', player: {}, room: {} }, action) => {
+const reducer = (state = { lang: 'en', player: {roomName:''}, room: {} }, action) => {
   switch (action.type) {
     case 'CHANGE_LANG': return { ...state, lang: action.payload };
     case 'SET_PLAYER': return { ...state, player:{ ...state.player, ...action.payload } }
@@ -22,6 +22,7 @@ socket.on('player',data=>{
   store.dispatch(setPlayer(data))
   console.log('set player')
 })
+socket.on('connect',()=>socket.emit('player',store.getState().player))
 
 export {
   store,

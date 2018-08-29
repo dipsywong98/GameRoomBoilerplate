@@ -8,10 +8,12 @@ const onCreateRoom = (id,data)=>{
   console.log(`id ${id} call create room with data ${JSON.stringify(data)}`)
   const client = this.clients[id]
   try{
+    if(data.roomName === '')throw 'invalid room name'
     createRoom(client,data)
     client.emit('player',{roomName:data.name})
   }catch(e){
     console.log(e)
+    client.emit('alert',e)
   }
 }
 
@@ -21,30 +23,38 @@ const onPlayer = (id, data)=>{
   this.clients[id] = {...client, ...data}
   //some actions on the client
 
-  if(client.roomName != data.roomName){
-    if(client.roomName === '' && !!data.roomName){
+  if('roomName' in data){
+    if(data.roomName !== ''){
       try{
-        joinRoom(client,data.roomName)
-        client.emit('player',{roomName})
-      }catch(e){
-        client.emit('alert',e)
-      }
-    }else if(!!client.roomName && data.roomName===''){
-      try{
+        console.log('joinroom')
         leaveRoom(client)
-        client.emit('player',{roomName:''})
+        joinRoom(client,data.roomName)
+        client.emit('player',{roomName:data.roomName})
+        client.roomName = data.roomName
+        console.log(client.roomName)
       }catch(e){
+        console.log(e)
         client.emit('alert',e)
       }
     }
-    client.roomName = data.roomName
+    if(data.roomName===''){
+      try{
+        console.log('leaveroom',client.roomName)
+        leaveRoom(client)
+        client.emit('player',{roomName:''})
+      }catch(e){
+        console.log(e)
+        client.emit('alert',e)
+      }
+    }
   }
   this.clients[id] = {...client, ...data}
 }
 
 const onDisconnect = (id, data)=>{
   const client = this.clients[id]
-  console.log(id+'disconnected')
+  console.log(id+'disconnected and leave room')
+  leaveRoom(client)
   delete this.clients[id] 
 }
 
