@@ -1,11 +1,3 @@
-// exports.init = (io)=>{
-//   this.io = io
-// }
-exports.playerSocket = (io,{id})=>{
+exports.socketById = (io,id)=>{
   return io.sockets.connected[id]
 }
-
-// module.exports = (...params)=>{
-//   init(...params)
-//   return this
-// }

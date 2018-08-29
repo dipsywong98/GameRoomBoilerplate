@@ -1,5 +1,3 @@
-const { playerSocket } = require('./helpers')
-
 const init = (app, io) => {
   this.app = app
   this.io = io
@@ -20,6 +18,7 @@ const createRoom = (player, options) => {
     created: Date.now()
   }
   this.rooms[newRoom.name] = newRoom
+  console.log(player.id+' createdroom '+name)
   return joinRoom(player, name)
 }
 
@@ -28,8 +27,9 @@ const joinRoom = (player, roomName) => {
     const room = this.rooms[roomName]
     room.players[player.id] = player.name
     this.io.emit('lobby', room)
+    console.log(player.id+' joinroom '+roomName)
     return room
-  } else throw 'no such game room'
+  } else createRoom(player,{name:roomName})//throw 'no such game room'
 }
 
 const leaveRoom = (player) => {

@@ -5,7 +5,6 @@ import { initGA, logPageView } from '../lib/ga'
 import Loading from './svg/loading'
 import Home from './home'
 import Lobby from './lobby'
-import Room from './room'
 import { Typography } from '@material-ui/core';
 import withRoot from '../withRoot'
 import { withStyles } from '@material-ui/core/styles'
@@ -32,7 +31,7 @@ class App extends Component {
   }
   render() {
     if(this.state.loading)return <div style={{paddingTop:'20em',textAlign:'center'}}><Typography>LOADING...</Typography></div>
-    const Element = [Home, Lobby, Room][this.state.playerState]
+    const Element = [Home, Lobby][this.state.playerState]
     return (<Provider store={store}>
       <Element changeState={playerState=>this.setState({playerState})}/>
     </Provider>)

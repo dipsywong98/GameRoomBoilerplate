@@ -84,7 +84,8 @@ class Lobby extends Component {
   render(){
     const { player } = this.props
     const { rooms } = this.state
-    if (!('roomName' in player) || (player.roomName === '')) {
+    console.log('player.roomName',player.roomName)
+    if (!('roomName' in player) || (player.roomName === '') || !(player.roomName in rooms)) {
       return this.renderLobby()
     } else {
       return this.renderRoom(rooms[player.roomName])
