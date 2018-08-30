@@ -47,13 +47,13 @@ class Picker extends Component {
     const open = !!anchorEl
     return (
       <div>
-        <select onChange={({target:{value}})=>this.handleClose(value)}>
+        {/* <select onChange={({target:{value}})=>this.handleClose(value)}>
           {Object.keys(langList).map(lang => (
               <option value={lang} key={langList[lang].name}>
                 {langList[lang].name}
               </option>))}
-        </select>
-        {/* <Button variant='outlined' onClick={this.handleClick}>
+        </select> */}
+        <Button variant='outlined' onClick={this.handleClick}>
           Language <Language />
         </Button>
         <Menu
@@ -68,7 +68,7 @@ class Picker extends Component {
                 {langList[lang].name}
               </MenuItem>))
           }
-        </Menu> */}
+        </Menu>
       </div>
     )
   }

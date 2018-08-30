@@ -22,6 +22,12 @@ function withRoot(Component) {
 
     pageContext = null;
 
+    // getChildContext() { 
+    //   return {
+    //     muiTheme: ThemeManager.getCurrentTheme()
+    //   };
+    // }
+
     render() {
       // MuiThemeProvider makes the theme available down the React tree thanks to React context.
       return (

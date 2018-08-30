@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/app.js'
+import Page from './components/page.js'
 
 // ========================================
 
 ReactDOM.render(
-  <App />,
+  <Page />,
   document.getElementById('root')
 );
 

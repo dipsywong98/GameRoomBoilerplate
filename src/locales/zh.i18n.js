@@ -4,6 +4,7 @@ export default {
     welcome:'歡迎',
     enter_your_name:'你的名字',
     tutorial:'教學',
-    play: '玩'
+    play: '玩',
+    lobby: 'lobby'
   }
 }

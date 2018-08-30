@@ -9,17 +9,9 @@ import { Typography } from '@material-ui/core';
 import withRoot from '../withRoot'
 import { withStyles } from '@material-ui/core/styles'
 
-const styles = theme => ({
-  root: {
-    textAlign: 'center',
-    paddingTop: theme.spacing.unit * 20,
-  },
-})
-
-class App extends Component {
+export default class App extends Component {
   state = {
-    loading: true,
-    playerState: 0
+    loading: true
   }
   componentDidMount() {
     if (!window.GA_INITIALIZED) {
@@ -31,11 +23,6 @@ class App extends Component {
   }
   render() {
     if(this.state.loading)return <div style={{paddingTop:'20em',textAlign:'center'}}><Typography>LOADING...</Typography></div>
-    const Element = [Home, Lobby][this.state.playerState]
-    return (<Provider store={store}>
-      <Element changeState={playerState=>this.setState({playerState})}/>
-    </Provider>)
+    return (<Provider store={store} children={this.props.children}/>)
   }
 }
-
-export default withRoot(withStyles(styles)(App))
