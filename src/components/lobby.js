@@ -8,6 +8,8 @@ import ChatRoom from './chatroom'
 import root from '../lib/get-server-root'
 import { withi18n } from '../lib/i18n'
 import { withStyles } from '@material-ui/core/styles'
+import withLobby from '../lib/with-lobby'
+import withUiState from '../lib/with-ui-state'
 
 const styles = theme => ({
   root: {
@@ -46,30 +48,18 @@ const styles = theme => ({
 
 class Lobby extends Component {
   state = {
-    roomName: '',
-    rooms: {}
+    roomName: ''
   }
   constructor(props) {
     super(props)
     request.get(root() + '/gamerooms', (err, httpResponse, body) => {
       console.log({ err, httpResponse, body })
       if (httpResponse.statusCode === 200) {
-        this.setState({ rooms: JSON.parse(body) })
+        this.props.initLobby(JSON.parse(body))
       } else {
         window.alert(body)
       }
     })
-    socket.on('lobby', (room) => {
-      const { rooms } = this.state
-      rooms[room.name] = room
-      if (room.deleted) {
-        delete rooms[room.name]
-      }
-      this.setState({ rooms })
-    })
-  }
-  componentWillUnmount() {
-    socket.removeAllListeners('lobby')
   }
   requestCreateRoom = () => {
     const { roomName: name } = this.state
@@ -83,11 +73,8 @@ class Lobby extends Component {
   leaveRoom = () => {
     socket.emit('player', { roomName: '' })
   }
-  callStartGame = () => {
-    socket.emit('player',{startGame: true})
-  }
-  renderLobby() {
-    console.log(this.state.rooms)
+  render() {
+    console.log(this.props.lobby)
     const { i18n: { ui }, classes } = this.props
     return (
       <div className={classes.root}>
@@ -105,7 +92,7 @@ class Lobby extends Component {
               <Button
                 variant="raised"
                 color='secondary'
-                onClick={() => this.props.changeState(0)}>{ui.back}</Button>
+                onClick={() => this.props.setUiState(0)}>{ui.back}</Button>
             </Grid>
             {/* <Grid item>
               <Button
@@ -120,7 +107,7 @@ class Lobby extends Component {
                 variant="raised">{ui.create}</Button>
             </Grid>
           </Grid>
-          {Object.values(this.state.rooms).filter(({started})=>started==null).map(room => (
+          {this.props.lobby&&Object.values(this.props.lobby).filter(({started})=>started==null).map(room => (
             <Card className={classes.card} key={room.name} onClick={() => this.requestJoinRoom(room)}>
               <Grid container justify='space-between'>
                 <Grid item>
@@ -137,53 +124,6 @@ class Lobby extends Component {
       </div>
     )
   }
-  renderRoom(room) {
-    const { i18n: { ui }, classes } = this.props
-    return (
-      <div className={classes.root}>
-        <Grid item style={{ margin: 'auto' }}>
-          <Grid direction='column' container justify='center'>
-            <Grid item style={{ margin: "8px" }}>
-              <Typography variant="display3">{ui.room}: {room.name}</Typography>
-            </Grid>
-            <Grid container direction='column' justify='center'>
-              {(Object.values(room.players).map(name => (
-                <Grid style={{ margin: "8px" }} key={name} item>
-                  <Card className={classes.card}>
-                    <Grid container justify='space-between'>
-                      <Grid item>
-                        <Typography>{name}</Typography>
-                      </Grid>
-                      <Grid>
-                        <Typography> </Typography>
-                      </Grid>
-                    </Grid>
-                  </Card>
-                </Grid>
-              )))}
-            </Grid>
-            <Grid container alignItems='baseline' justify='center' style={{ margin: "8px" }}>
-              <Grid style={{ margin: "8px" }} item>
-                <Button variant='raised' color='secondary' onClick={this.leaveRoom}>{ui.leave}</Button>
-              </Grid>
-              <Grid style={{ margin: "8px" }} item>
-                <Button variant='raised' color='primary' onClick={this.callStartGame}>{ui.start}</Button>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </div>
-    )
-  }
-  render() {
-    const { player } = this.props
-    const { rooms } = this.state
-    if (!('roomName' in player) || (player.roomName === '') || !(player.roomName in rooms)) {
-      return this.renderLobby()
-    } else {
-      return this.renderRoom(rooms[player.roomName])
-    }
-  }
 }
 
-export default withStyles(styles)(withi18n(withGame(withPlayer(Lobby))))
+export default withUiState(withLobby(withStyles(styles)(withi18n(withGame(withPlayer(Lobby))))))

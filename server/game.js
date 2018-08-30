@@ -47,11 +47,11 @@ const onGame = (roomName, player_id, data)=>{
     const {boxes} = game
     if(boxes[place[0]][place[1]] === null){
       boxes[place[0]][place[1]] = game.symbol[index]
+      game.currentPlayer = 1-game.currentPlayer
+      roomEmit(roomName,'game',{boxes,currentPlayer:game.currentPlayer})
     }else{
       socketById(player_id).emit('alert','this box is already occupied')
     }
-    game.currentPlayer = 1-game.currentPlayer
-    roomEmit(roomName,'game',{boxes,currentPlayer:game.currentPlayer})
   }
   let symbol
   if((symbol = checkWinning(game))!==null){
