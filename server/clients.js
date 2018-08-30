@@ -1,5 +1,5 @@
 const {createRoom,joinRoom,leaveRoom} = require('./lobby')
-const {startGame} = require('./game')
+const {startGame, onGame} = require('./game')
 
 const init = ()=>{
   this.clients = {}
@@ -73,6 +73,7 @@ exports.newClient = (socket)=>{
   socket.on('player',data=>onPlayer(id, data))
   socket.on('disconnect',data=>onDisconnect(id,data))
   socket.on('createRoom',data=>onCreateRoom(id,data))
+  socket.on('game',data=>onGame(this.clients[id].roomName,id,data))
   console.log('id '+id+' connected')
 }
 

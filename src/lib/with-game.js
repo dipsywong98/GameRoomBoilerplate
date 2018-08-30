@@ -6,7 +6,7 @@ const mapStateToProps = ({ game }) => ({ game })
 
 const mapDispatchToProps = (dispatch, ownProps) => ({
   setGame: (...args) => {
-    socket.emit('game',...args)
+    // socket.emit('game',...args)
     dispatch(setGame(...args))
   }
 })
