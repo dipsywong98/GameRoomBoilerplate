@@ -9,7 +9,7 @@ import { Typography } from '@material-ui/core';
 import withRoot from '../withRoot'
 import { withStyles } from '@material-ui/core/styles'
 
-export default class App extends Component {
+class App extends Component {
   state = {
     loading: true
   }
@@ -26,3 +26,5 @@ export default class App extends Component {
     return (<Provider store={store} children={this.props.children}/>)
   }
 }
+
+export default withRoot(App)

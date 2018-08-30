@@ -1,4 +1,5 @@
 const {createRoom,joinRoom,leaveRoom} = require('./lobby')
+const {startGame} = require('./game')
 
 const init = ()=>{
   this.clients = {}
@@ -50,6 +51,10 @@ const onPlayer = (id, data)=>{
         client.emit('alert',e)
       }
     }
+  }
+
+  if('startGame' in data){
+    startGame(client.roomName)
   }
   // this.clients[id] = {...client, ...data}
 }

@@ -3,7 +3,7 @@ import { Typography, Grid, Button, TextField, Card } from '@material-ui/core/ind
 import request from 'request'
 import socket from '../lib/socket-client-helper'
 import withPlayer from '../lib/with-player'
-import withRoom from '../lib/with-room'
+import withGame from '../lib/with-game'
 import ChatRoom from './chatroom'
 import root from '../lib/get-server-root'
 import { withi18n } from '../lib/i18n'
@@ -80,17 +80,11 @@ class Lobby extends Component {
     const { player } = this.props
     socket.emit('player', { roomName: room.name })
   }
-  onJoinRoom = (room) => {
-    console.log('successfully joined room', room)
-    this.props.setPlayer({ room: room.name })
-    this.props.setRoom(room)
-    // this.props.changeState(2)
-  }
   leaveRoom = () => {
     socket.emit('player', { roomName: '' })
   }
-  startGame = () => {
-    window.alert('start game')
+  callStartGame = () => {
+    socket.emit('player',{startGame: true})
   }
   renderLobby() {
     console.log(this.state.rooms)
@@ -173,7 +167,7 @@ class Lobby extends Component {
                 <Button variant='raised' color='secondary' onClick={this.leaveRoom}>{ui.leave}</Button>
               </Grid>
               <Grid style={{ margin: "8px" }} item>
-                <Button variant='raised' color='primary' onClick={this.startGame}>{ui.start}</Button>
+                <Button variant='raised' color='primary' onClick={this.callStartGame}>{ui.start}</Button>
               </Grid>
             </Grid>
           </Grid>
@@ -192,4 +186,4 @@ class Lobby extends Component {
   }
 }
 
-export default withStyles(styles)(withi18n(withRoom(withPlayer(Lobby))))
+export default withStyles(styles)(withi18n(withGame(withPlayer(Lobby))))

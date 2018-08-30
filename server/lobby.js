@@ -1,3 +1,5 @@
+const {socketById} = require('./helpers')
+
 const init = (app, io) => {
   this.app = app
   this.io = io
@@ -50,11 +52,22 @@ const removeRoom = (roomName) => {
   this.io.emit('lobby',{ name: roomName, deleted: true })
 }
 
+const getRoom = roomName => this.rooms[roomName]
+const roomEmit = (roomName, channel, ...data) => {
+  if(roomName in this.rooms){
+    Object.keys(this.rooms[roomName].players).forEach(socketid=>socketById(this.io,socketid).emit(channel, ...data))
+  } else {
+    console.log(`publish: roomName ${roomName} not exist`)
+  }
+}
+
 exports.log = () => console.log(this.text)
+exports.getRoom = getRoom
 exports.joinRoom = joinRoom
 exports.createRoom = createRoom
 exports.leaveRoom = leaveRoom
 exports.removeRoom = removeRoom
+exports.roomEmit = roomEmit
 exports.init = init
 // module.exports = (...params) => {
 //   init(...params)

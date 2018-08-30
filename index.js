@@ -17,6 +17,8 @@ lobby.init(app,io)
 lobby.log()
 
 const clients = require('./server/clients')(lobby)
+const game = require('./server/game')
+game.init()
 
 const port = process.env.PORT || 80
 
