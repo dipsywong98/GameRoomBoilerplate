@@ -120,7 +120,7 @@ class Lobby extends Component {
                 variant="raised">{ui.create}</Button>
             </Grid>
           </Grid>
-          {Object.values(this.state.rooms).map(room => (
+          {Object.values(this.state.rooms).filter(({started})=>started==null).map(room => (
             <Card className={classes.card} key={room.name} onClick={() => this.requestJoinRoom(room)}>
               <Grid container justify='space-between'>
                 <Grid item>

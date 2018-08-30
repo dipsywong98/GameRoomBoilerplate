@@ -9,6 +9,7 @@ const init = (app, io) => {
   app.get('/gamerooms', (req, res) => {
     res.send(this.rooms)
   })
+  exports.io = this.io
 }
 
 const createRoom = (player, options) => {
@@ -17,7 +18,8 @@ const createRoom = (player, options) => {
   const newRoom = {
     name,
     players: {},
-    created: Date.now()
+    created: Date.now(),
+    started: null
   }
   this.rooms[newRoom.name] = newRoom
   console.log(player.id+' createdroom '+name)
@@ -53,6 +55,7 @@ const removeRoom = (roomName) => {
 }
 
 const getRoom = roomName => this.rooms[roomName]
+
 const roomEmit = (roomName, channel, ...data) => {
   if(roomName in this.rooms){
     Object.keys(this.rooms[roomName].players).forEach(socketid=>socketById(this.io,socketid).emit(channel, ...data))

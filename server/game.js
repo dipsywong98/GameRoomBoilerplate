@@ -1,4 +1,4 @@
-const {getRoom, roomEmit} = require('./lobby')
+const {getRoom, roomEmit, io} = require('./lobby')
 
 const init = ()=>{
   this.games = {}
@@ -6,7 +6,10 @@ const init = ()=>{
 
 const startGame = roomName => {
   const newGame = {roomName,started:true,players:{}}
-  const players = getRoom(roomName).players
+  const room = getRoom(roomName)
+  const players = room.players
+  room.started = Date.now()
+  io.emit('lobby',room)
   Object.keys(players).forEach(id=>newGame.players[id]={})
   this.games[roomName] = newGame
   roomEmit(roomName,'game',newGame)
