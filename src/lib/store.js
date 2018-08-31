@@ -29,7 +29,7 @@ const reducer = (state = { lang: 'en', player: { roomName: '' }, game: { started
       const uiState = action.payload
       if (uiState === 1 || uiState === 2) {
         if (state.uiState !== 1 && state.uiState !== 2) {
-          request.get(root() + '/gamerooms', (err, httpResponse, body) => {
+          request.get(root() + 'gamerooms', (err, httpResponse, body) => {
             console.log({ err, httpResponse, body })
             if (httpResponse.statusCode === 200) {
               store.dispatch(initLobby(JSON.parse(body)))
