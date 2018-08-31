@@ -8,11 +8,6 @@ import Loading from './svg/loading'
 import ToggleDeleteButton from './toggle-delete-button'
 import withGame from '../lib/with-game'
 import socket from '../lib/socket-client-helper'
-import Dialog from '@material-ui/core/Dialog';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogContentText from '@material-ui/core/DialogContentText';
-import DialogActions from '@material-ui/core/DialogActions';
 
 const styles = theme => ({
   paper: {
@@ -32,17 +27,6 @@ class Game extends Component {
     const { game } = this.props
     const { players, boxes, winner, currentPlayer } = game
     return <div>
-      <Dialog open={!!winner} onClose={this.onGameEnd}>
-        <DialogTitle>The Winner is</DialogTitle>
-        <DialogContent>
-          <DialogContentText>{winner && winner.name}</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button color="primary" onClick={this.onGameEnd}>
-            OK
-          </Button>
-        </DialogActions>
-      </Dialog>
       {Object.values(players).map((player,k) => (<p key={'p'+k}>{player.name}({player.symbol}) {(k===currentPlayer)?'<---Turn':null}</p>))}
       {boxes.map((row, i) => (
         <div key={i} style={{display:'flex'}}>

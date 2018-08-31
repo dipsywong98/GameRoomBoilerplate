@@ -50,8 +50,10 @@ const leaveRoom = (player) => {
 }
 
 const removeRoom = (roomName) => {
+  console.log('remove room',roomName)
   delete this.rooms[roomName]
   this.io.emit('lobby',{ name: roomName, deleted: true })
+  require('./game').endGame(roomName)
 }
 
 const getRoom = roomName => this.rooms[roomName]

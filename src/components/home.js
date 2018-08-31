@@ -14,6 +14,7 @@ import after24hours from '../lib/after24hours'
 import randInt from '../lib/rand-int'
 import {connect} from 'react-redux'
 import withUiState from '../lib/with-ui-state'
+import withModal from '../lib/with-modal'
 
 console.log(process.env.SERVER)
 
@@ -88,7 +89,7 @@ class Home extends Component {
               <Button
                 variant="raised"
                 color="secondary"
-                onClick={this.newRoom}>
+                onClick={this.showModal}>
                 {ui.tutorial}
               </Button>
             </Grid>
@@ -117,4 +118,4 @@ class Home extends Component {
   }
 }
 
-export default withUiState(withi18n(withPlayer(withStyles(styles)(Home))))
+export default withModal(withUiState(withi18n(withPlayer(withStyles(styles)(Home)))))

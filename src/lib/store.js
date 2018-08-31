@@ -1,14 +1,28 @@
 import { createStore } from 'redux'
 import socket from './socket-client-helper'
 
-const reducer = (state = { lang: 'en', player: { roomName: '' }, game: { started: false }, uiState: 0, lobby: {} }, action) => {
+const defaultModal = () => ({
+  title: '',
+  text: '',
+  buttons: [{
+    text: 'CLOSE',
+    color: 'secondary',
+    variant: null
+  }],
+  show: false
+})
+
+const reducer = (state = { lang: 'en', player: { roomName: '' }, game: { started: false }, uiState: 0, lobby: {}, modal: defaultModal() }, action) => {
   switch (action.type) {
     case 'CHANGE_LANG': return { ...state, lang: action.payload };
     case 'SET_PLAYER':
-      if(state.uiState === 1 && action.payload.roomName !== '')state.uiState = 2
-      else if(state.uiState > 1 && action.payload.roomName === '')state.uiState = 1
+      if (state.uiState === 1 && action.payload.roomName !== '') state = reducer(state, setUiState(2))
+      else if (state.uiState > 1 && action.payload.roomName === '') state = reducer(state, setUiState(1))
       return { ...state, player: { ...state.player, ...action.payload } }
-    case 'SET_GAME': return { ...state, game: { ...state.game, ...action.payload } }
+    case 'SET_GAME':
+      if (state.uiState === 2 && action.payload.started) state = reducer(state, setUiState(3))
+      else if (state.uiState === 3 && action.payload.winner) state = reducer(state, setUiState(4))
+      return { ...state, game: { ...state.game, ...action.payload } }
     case 'SET_UI_STATE':
       const uiState = action.payload
       if (uiState === 1 || uiState === 2) {
@@ -20,11 +34,15 @@ const reducer = (state = { lang: 'en', player: { roomName: '' }, game: { started
       }
       return { ...state, uiState }
     case 'SET_LOBBY':
-      state.lobby[action.payload.name] = action.payload
-      if (action.payload.deleted) delete state.lobby[action.payload.name]
-      return state
+      console.log('set lobby', action.payload)
+      let lobby = { ...state.lobby }
+      lobby[action.payload.name] = action.payload
+      if (action.payload.deleted) delete lobby[action.payload.name]
+      return { ...state, lobby }
     case 'INIT_LOBBY':
-      return {...state,lobby:action.payload}
+      return { ...state, lobby: action.payload }
+    case 'SET_MODAL':
+      return { ...state, modal: { ...defaultModal(), ...action.payload } }
     default: return state;
   }
 }
@@ -34,7 +52,8 @@ const setPlayer = player => ({ type: 'SET_PLAYER', payload: player })
 const setGame = game => ({ type: 'SET_GAME', payload: game })
 const setUiState = state => ({ type: 'SET_UI_STATE', payload: state })
 const setLobby = lobby => ({ type: 'SET_LOBBY', payload: lobby })
-const initLobby = lobby => ({ type: 'INIT_LOBBY', payload: lobby})
+const initLobby = lobby => ({ type: 'INIT_LOBBY', payload: lobby })
+const setModal = modal => ({ type: 'SET_MODAL', payload: modal })
 
 const store = createStore(reducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
@@ -56,5 +75,6 @@ export {
   setPlayer,
   setGame,
   setUiState,
-  initLobby
+  initLobby,
+  setModal
 }

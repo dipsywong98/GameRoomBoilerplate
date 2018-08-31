@@ -7,12 +7,16 @@ import Game from './game'
 import Room from './room'
 import withGame from '../lib/with-game'
 import withUiState from '../lib/with-ui-state'
+import Modal from './modal'
 
 class _Page extends React.Component {
   render() {
-    const Element = [Home, Lobby, Room, Game][this.props.uiState]
+    const Element = [Home, Lobby, Room, Game, Game][this.props.uiState]
     return (
+      <div>
+        <Modal />
         <Element />
+      </div>
     )
   }
 }

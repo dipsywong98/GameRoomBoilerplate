@@ -59,6 +59,7 @@ class Room extends Component {
   render() {
     const { i18n: { ui }, classes } = this.props
     const room = this.props.lobby[this.props.player.roomName]
+    if(!room)return <Typography>LOADING</Typography>
     return (
       <div className={classes.root}>
         <Grid item style={{ margin: 'auto' }}>

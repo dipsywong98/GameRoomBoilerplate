@@ -5,15 +5,15 @@ const init = ()=>{
   this.games = {}
 }
 
-const initialState = {
+const initialState = ()=> ({
   winner: null,
   currentPlayer: 0,
   boxes: [[null,null,null],[null,null,null],[null,null,null]],
   symbol: ['O','X']
-}
+})
 
 const startGame = roomName => {
-  const newGame = {roomName,started:true,players_map:{},players:{},...initialState}
+  const newGame = {roomName,started:true,players_map:{},players:{},...initialState()}
   const room = getRoom(roomName)
   const players = room.players
   room.started = Date.now()
