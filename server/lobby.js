@@ -19,7 +19,8 @@ const createRoom = (player, options) => {
     name,
     players: {},
     created: Date.now(),
-    started: null
+    started: null,
+    master: player.id
   }
   this.rooms[newRoom.name] = newRoom
   console.log(player.id+' createdroom '+name)
@@ -29,7 +30,7 @@ const createRoom = (player, options) => {
 const joinRoom = (player, roomName) => {
   if (roomName in this.rooms) {
     const room = this.rooms[roomName]
-    room.players[player.id] = player.name
+    room.players[player.id] = {name:player.name, ready: false}
     this.io.emit('lobby', room)
     console.log(player.id+' joinroom '+roomName)
     return room
@@ -40,11 +41,13 @@ const leaveRoom = (player) => {
   let roomName = ''
   if(!('roomName' in player)||((roomName = player.roomName)===''))return console.log('player dont belongs to room')
   if(!(roomName in this.rooms))return console.log('room '+roomName+' does not exist')
-  const { players } = this.rooms[roomName]
+  const room = this.rooms[roomName]
+  const { players } = room
   delete players[player.id]
   if (Object.keys(players).length === 0) {
     removeRoom(roomName)
   } else {
+    if(player.id == room.master)room.master = Object.keys(room.players)[0]
     this.io.emit('lobby',this.rooms[roomName])
   }
 }

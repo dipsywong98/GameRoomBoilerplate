@@ -57,7 +57,7 @@ class Room extends Component {
     socket.emit('player',{startGame: true})
   }
   render() {
-    const { i18n: { ui }, classes } = this.props
+    const { i18n: { ui }, classes, player } = this.props
     const room = this.props.lobby[this.props.player.roomName]
     if(!room)return <Typography>LOADING</Typography>
     return (
@@ -68,7 +68,7 @@ class Room extends Component {
               <Typography variant="display3">{ui.room}: {room.name}</Typography>
             </Grid>
             <Grid container direction='column' justify='center'>
-              {(Object.values(room.players).map(name => (
+              {(Object.keys(room.players).map(id=>({id,...room.players[id]})).map(({id,name, ready}) => (
                 <Grid style={{ margin: "8px" }} key={name} item>
                   <Card className={classes.card}>
                     <Grid container justify='space-between'>
@@ -76,7 +76,7 @@ class Room extends Component {
                         <Typography>{name}</Typography>
                       </Grid>
                       <Grid>
-                        <Typography> </Typography>
+                        <Typography>{(id===room.master?'master':(ready?'ready':'not ready'))}</Typography>
                       </Grid>
                     </Grid>
                   </Card>
@@ -88,7 +88,7 @@ class Room extends Component {
                 <Button variant='raised' color='secondary' onClick={this.leaveRoom}>{ui.leave}</Button>
               </Grid>
               <Grid style={{ margin: "8px" }} item>
-                <Button variant='raised' color='primary' onClick={this.callStartGame}>{ui.start}</Button>
+                <Button variant='raised' color='primary' onClick={this.callStartGame}>{(player.id === room.master?ui.start:ui.ready)}</Button>
               </Grid>
             </Grid>
           </Grid>

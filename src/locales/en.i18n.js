@@ -13,6 +13,7 @@ export default {
     search: 'Search',
     leave: 'Leave',
     start: 'Start',
-    room: 'Room'
+    room: 'Room',
+    ready: 'Ready'
   }
 }

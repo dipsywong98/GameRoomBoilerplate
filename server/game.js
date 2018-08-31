@@ -21,7 +21,7 @@ const startGame = roomName => {
   Object.keys(players).forEach((id, k) => {
     newGame.players_map[id] = k
     newGame.players_map[k] = id
-    newGame.players[id] = { name: players[id] }
+    newGame.players[id] = { name: players[id].name }
     newGame.players[id].symbol = newGame.symbol[k]
   })
   //initialization of game
@@ -34,7 +34,12 @@ const startGame = roomName => {
 }
 
 const endGame = (roomName) => {
-  getRoom(roomName) && ((getRoom(roomName).started = false) + io.emit('lobby', getRoom(roomName)))
+  const room = getRoom(roomName)
+  if(room){
+    room.started = false
+    for(let k in room.players)room.players[k].ready = false
+    io.emit('lobby',room)
+  }
   delete this.games[roomName]
   roomEmit(roomName, 'game', { started: false })
 }

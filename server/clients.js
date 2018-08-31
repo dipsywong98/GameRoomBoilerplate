@@ -1,5 +1,6 @@
-const {createRoom,joinRoom,leaveRoom} = require('./lobby')
+const {createRoom,joinRoom,leaveRoom,getRoom,io} = require('./lobby')
 const {startGame, onGame} = require('./game')
+const socketById = id => require('./helpers').socketById(io, id)
 
 const init = ()=>{
   this.clients = {}
@@ -54,7 +55,26 @@ const onPlayer = (id, data)=>{
   }
 
   if('startGame' in data){
-    startGame(client.roomName)
+    const roomName = client.roomName
+    const room = getRoom(roomName)
+    if(id === room.master){
+      let flag = ''
+      for(let k in room.players){
+        if(k===room.master)continue
+        if(!room.players[k].ready){
+          flag += ' "'+room.players[k].name+'" '
+          break
+        }
+      }
+      if(!flag){
+        startGame(roomName)
+      }else{
+        socketById(id).emit('alert', `player(s) ${flag} have not ready`)
+      }
+    }else{
+      room.players[id].ready = !room.players[id].ready
+      io.emit('lobby',room)
+    }
   }
   // this.clients[id] = {...client, ...data}
 }
