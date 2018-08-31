@@ -12,7 +12,9 @@ import LastUpdate from './last-update'
 import after24hours from '../lib/after24hours'
 // import ChatRoom from './chatroom'
 import randInt from '../lib/rand-int'
-import {connect} from 'react-redux'
+import { connect } from 'react-redux'
+import withUiState from '../lib/with-ui-state'
+import withModal from '../lib/with-modal'
 
 console.log(process.env.SERVER)
 
@@ -87,7 +89,7 @@ class Home extends Component {
               <Button
                 variant="raised"
                 color="secondary"
-                onClick={this.newRoom}>
+                onClick={this.showModal}>
                 {ui.tutorial}
               </Button>
             </Grid>
@@ -95,7 +97,7 @@ class Home extends Component {
               <Button
                 variant="raised"
                 color="primary"
-                onClick={()=>this.props.setPlayer({name})&&this.props.changeState(1)}
+                onClick={() => this.props.setPlayer({ name }) && this.props.setUiState(1)}
                 disabled={!name || loading}>
                 {ui.play}
               </Button>
@@ -116,4 +118,4 @@ class Home extends Component {
   }
 }
 
-export default withi18n(withPlayer(withStyles(styles)(Home)))
+export default withModal(withUiState(withi18n(withPlayer(withStyles(styles)(Home)))))
