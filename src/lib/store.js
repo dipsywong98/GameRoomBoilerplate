@@ -1,5 +1,7 @@
 import { createStore } from 'redux'
 import socket from './socket-client-helper'
+import request from 'request'
+import root from './get-server-root'
 
 const defaultModal = () => ({
   title: '',
@@ -21,12 +23,20 @@ const reducer = (state = { lang: 'en', player: { roomName: '' }, game: { started
       return { ...state, player: { ...state.player, ...action.payload } }
     case 'SET_GAME':
       if (state.uiState === 2 && action.payload.started) state = reducer(state, setUiState(3))
-      else if (state.uiState === 3 && action.payload.winner) state = reducer(state, setUiState(4))
+      if (state.uiState === 3 && action.payload.result) state = reducer(state, setUiState(4))
       return { ...state, game: { ...state.game, ...action.payload } }
     case 'SET_UI_STATE':
       const uiState = action.payload
       if (uiState === 1 || uiState === 2) {
         if (state.uiState !== 1 && state.uiState !== 2) {
+          request.get(root() + '/gamerooms', (err, httpResponse, body) => {
+            console.log({ err, httpResponse, body })
+            if (httpResponse.statusCode === 200) {
+              store.dispatch(initLobby(JSON.parse(body)))
+            } else {
+              window.alert(body)
+            }
+          })
           socket.on('lobby', data => store.dispatch(setLobby(data)))
         }
       } else {
@@ -40,7 +50,8 @@ const reducer = (state = { lang: 'en', player: { roomName: '' }, game: { started
       if (action.payload.deleted) delete lobby[action.payload.name]
       return { ...state, lobby }
     case 'INIT_LOBBY':
-      return { ...state, lobby: action.payload }
+      console.log('initlobby', action.playload)
+      return { ...state, lobby: { ...action.payload } }
     case 'SET_MODAL':
       return { ...state, modal: { ...defaultModal(), ...action.payload } }
     default: return state;

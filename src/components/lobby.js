@@ -1,11 +1,9 @@
 import React, { Component } from 'react'
 import { Typography, Grid, Button, TextField, Card } from '@material-ui/core/index'
-import request from 'request'
 import socket from '../lib/socket-client-helper'
 import withPlayer from '../lib/with-player'
 import withGame from '../lib/with-game'
 import ChatRoom from './chatroom'
-import root from '../lib/get-server-root'
 import { withi18n } from '../lib/i18n'
 import { withStyles } from '@material-ui/core/styles'
 import withLobby from '../lib/with-lobby'
@@ -49,17 +47,6 @@ const styles = theme => ({
 class Lobby extends Component {
   state = {
     roomName: ''
-  }
-  constructor(props) {
-    super(props)
-    request.get(root() + '/gamerooms', (err, httpResponse, body) => {
-      console.log({ err, httpResponse, body })
-      if (httpResponse.statusCode === 200) {
-        this.props.initLobby(JSON.parse(body))
-      } else {
-        window.alert(body)
-      }
-    })
   }
   requestCreateRoom = () => {
     const { roomName: name } = this.state
@@ -107,7 +94,7 @@ class Lobby extends Component {
                 variant="raised">{ui.create}</Button>
             </Grid>
           </Grid>
-          {this.props.lobby&&Object.values(this.props.lobby).filter(({started})=>started==null).map(room => (
+          {this.props.lobby && Object.values(this.props.lobby).filter(({ started }) => !started).map(room => (
             <Card className={classes.card} key={room.name} onClick={() => this.requestJoinRoom(room)}>
               <Grid container justify='space-between'>
                 <Grid item>
