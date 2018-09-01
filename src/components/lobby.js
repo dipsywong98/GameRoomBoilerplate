@@ -56,7 +56,6 @@ class Lobby extends Component {
   requestCreateRoom = () => {
     const { roomName: name } = this.state
     const { player, i18n: { ui }, setModal } = this.props
-    console.log('request create room')
     setModal({
       title: ui.create,
       text: (<NewRoomForm onChange={options => this.setState({ options })} />),
@@ -77,7 +76,7 @@ class Lobby extends Component {
           socket.emit('createRoom', options)
         }
       }, {
-        text: 'cancel'
+        text: ui.cancel
       }]
     })
 
@@ -85,11 +84,11 @@ class Lobby extends Component {
   requestJoinRoom = (room) => {
     const { player, setModal, i18n: { ui } } = this.props
     let password = ''
-    if(Object.keys(room.players).length>=room.upperLimit)return setModal({text:`${ui.room} "${room.name}" ${ui.alreadyFull}`})
+    if (Object.keys(room.players).length >= room.upperLimit) return setModal({ text: `${ui.room} "${room.name}" ${ui.alreadyFull}` })
     if (room.password) {
       setModal({
         title: ui.password,
-        text: (<div style={{display:'flex',flexDirection:'column'}}>
+        text: (<div style={{ display: 'flex', flexDirection: 'column' }}>
           <TextField
             id="password-input"
             label={ui.password}
@@ -100,11 +99,11 @@ class Lobby extends Component {
           />
         </div>),
         buttons: [{
-          text: 'Join',
+          text: ui.join,
           onClick: () => {
             const sha_password = sha3_512(password)
             if (room.password !== sha_password) {
-              window.alert('incorrect password')
+              window.alert(ui.incorretPassword)
               return 1
             } else {
               socket.emit('player', { roomName: room.name, password: sha_password })
@@ -156,11 +155,13 @@ class Lobby extends Component {
           {this.props.lobby && Object.values(this.props.lobby).filter(({ started }) => !started).map(room => (
             <Card className={classes.card} key={room.name}>
               <Grid container justify='space-between' alignItems='baseline'>
-                <Grid item style={{maxWidth:'12em', overflow:'hidden', margin: '0px 8px'}}>
-                  <Typography style={{display:'flex'}}>{room.name}{room.password && <Lock />}</Typography>
+                <Grid item style={{ maxWidth: '12em', overflow: 'hidden', margin: '0px 8px' }}>
+                  <Typography style={{ display: 'flex' }}>{room.name}{room.password && <Lock />}</Typography>
                 </Grid>
                 <Grid item>
-                  <Button onClick={() => this.requestJoinRoom(room)}>{ui.join} [{Object.keys(room.players).length}{room.upperLimit&&'/'+room.upperLimit}] </Button>
+                  <Button onClick={() => this.requestJoinRoom(room)}>
+                    {ui.join} [{Object.keys(room.players).length}{room.upperLimit && '/' + room.upperLimit}]
+                  </Button>
                 </Grid>
               </Grid>
             </Card>

@@ -78,7 +78,7 @@ const kick = (roomName, id, kickedPlayer) => {
 
   kickedPlayer.emit('player',{roomName: ''})
   leaveRoom(kickedPlayer)
-  kickedPlayer.emit('alert','you are kicked by room master')
+  setTimeout(()=>kickedPlayer.emit('alert','you are kicked by room master'),100)
 }
 
 const getRoom = roomName => this.rooms[roomName]

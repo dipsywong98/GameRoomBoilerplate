@@ -27,6 +27,8 @@ export default {
     join: 'Join',
     areYouSureToKick: name => `Are you sure to kick "${name}" out of room?`,
     yes: 'Yes',
-    no: 'No'
+    no: 'No',
+    cancel: 'Cancel',
+    incorretPassword: 'Incorret Password'
   }
 }
