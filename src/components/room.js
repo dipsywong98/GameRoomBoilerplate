@@ -12,6 +12,16 @@ import withLobby from '../lib/with-lobby'
 import withUiState from '../lib/with-ui-state'
 import withModal from '../lib/with-modal'
 import roomSettings from '../lib/room-setting'
+import yellow from '@material-ui/core/colors/yellow'
+import lime from '@material-ui/core/colors/lime'
+import Emoji from './emoji'
+
+const colors = ['#FFFFFF', lime[500], yellow[500]]
+const identityEmojis = [
+  <Emoji symbol='❌' label='cross' />,
+  <Emoji symbol='✔️' label='tick' />,
+  <Emoji symbol='👑' label='crown' />
+]
 
 const styles = theme => ({
   root: {
@@ -42,8 +52,8 @@ const styles = theme => ({
     marginRight: 20,
   },
   card: {
-    maxWidth: 200,
-    padding: 10,
+    maxWidth: '40em',
+    width: '20em',
     margin: 'auto'
   }
 });
@@ -58,15 +68,15 @@ class Room extends Component {
   callStartGame = () => {
     const { lobby, player, i18n: { ui }, setModal } = this.props
     const room = lobby[player.roomName]
-    const {playerRange:[lower]} = roomSettings()
+    const { playerRange: [lower] } = roomSettings()
     if (player.id !== room.master) {
       socket.emit('player', { startGame: true })
-    } else if (Object.keys(room.players).length < lower){
+    } else if (Object.keys(room.players).length < lower) {
       setModal({
         title: ui.alert,
         text: ui.requireNTostartGame(lower)
       })
-    }else {
+    } else {
       let flag = []
       for (let k in room.players) {
         if (k === room.master) continue
@@ -101,6 +111,19 @@ class Room extends Component {
     if (player_id === room.master) return 2
     return 0 + room.players[player_id].ready
   }
+
+  /**
+   * 
+   * @param {socket id of player} player_id
+   * @return {indentity} 0: normal people, 1: myself, 2: master
+   */
+  identity(player_id) {
+    const { lobby, player } = this.props
+    const room = lobby[player.roomName]
+    if (player_id === room.master) return 2
+    return 0 + (player_id === player.id)
+  }
+
   render() {
     const { i18n: { ui }, classes, player, lobby } = this.props
     const room = lobby[player.roomName]
@@ -109,19 +132,19 @@ class Room extends Component {
       <div className={classes.root}>
         <Grid item style={{ margin: 'auto' }}>
           <Grid direction='column' container justify='center'>
-            <Grid item style={{ margin: "8px" }}>
+            <Grid item style={{ margin: "8px", maxWidth: '90vw', wordWrap: 'break-word' }}>
               <Typography variant="display3">{ui.room}: {room.name}</Typography>
             </Grid>
             <Grid container direction='column' justify='center'>
               {(Object.keys(room.players).map(id => ({ id, ...room.players[id] })).map(({ id, name }) => (
                 <Grid style={{ margin: "8px" }} key={id} item>
-                  <Card className={classes.card}>
-                    <Grid container justify='space-between'>
-                      <Grid item>
+                  <Card className={classes.card} style={{ backgroundColor: colors[this.playerStatus(id)] }}>
+                    <Grid container justify='space-between' alignItems='baseline'>
+                      <Grid item style={{ maxWidth: '15em', overflow: 'hidden', margin: '0 8px' }}>
                         <Typography>{name}</Typography>
                       </Grid>
                       <Grid>
-                        <Typography>{ui.statusNames[this.playerStatus(id)]}</Typography>
+                        <Button>{identityEmojis[this.identity(id)]}</Button>
                       </Grid>
                     </Grid>
                   </Card>

@@ -1,7 +1,8 @@
 import io from 'socket.io-client'
 import {store,setPlayer} from './store'
+import root from './get-server-root'
 
-const socket = io(window.location.href.indexOf('localhost')!==-1?'http://localhost:80':'')
+const socket = io(root())
 
 let id = -1
 

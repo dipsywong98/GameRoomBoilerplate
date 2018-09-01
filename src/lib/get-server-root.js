@@ -1,1 +1,1 @@
-export default ()=>window.location.href.indexOf('localhost')!==-1?'http://localhost/':window.location.href
+export default ()=>window.location.href.replace(/:\d+/,':80')

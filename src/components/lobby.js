@@ -12,11 +12,11 @@ import NewRoomForm from './new-room-form'
 import withModal from '../lib/with-modal';
 import roomSettings from '../lib/room-setting'
 import { sha3_512 } from 'js-sha3'
+import Lock from './svg/lock'
 
 const styles = theme => ({
   root: {
     textAlign: 'center',
-
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
@@ -42,10 +42,9 @@ const styles = theme => ({
     marginRight: 20,
   },
   card: {
-    maxWidth: 200,
-    padding: 10,
     margin: 8,
-    margin: 'auto'
+    width: '20em',
+    maxWidth: '30em'
   }
 });
 
@@ -155,13 +154,13 @@ class Lobby extends Component {
             </Grid>
           </Grid>
           {this.props.lobby && Object.values(this.props.lobby).filter(({ started }) => !started).map(room => (
-            <Card className={classes.card} key={room.name} onClick={() => this.requestJoinRoom(room)}>
-              <Grid container justify='space-between'>
-                <Grid item>
-                  <Typography>{room.name}{room.password && '(password)'}</Typography>
+            <Card className={classes.card} key={room.name}>
+              <Grid container justify='space-between' alignItems='baseline'>
+                <Grid item style={{maxWidth:'12em', overflow:'hidden', margin: '0px 8px'}}>
+                  <Typography style={{display:'flex'}}>{room.name}{room.password && <Lock />}</Typography>
                 </Grid>
-                <Grid>
-                  <Typography>{Object.keys(room.players).length}{room.upperLimit&&'/'+room.upperLimit}</Typography>
+                <Grid item>
+                  <Button onClick={() => this.requestJoinRoom(room)}>{ui.join} [{Object.keys(room.players).length}{room.upperLimit&&'/'+room.upperLimit}] </Button>
                 </Grid>
               </Grid>
             </Card>

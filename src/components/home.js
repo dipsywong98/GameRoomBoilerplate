@@ -48,7 +48,7 @@ class Home extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      name: '',
+      name: this.props.player.name,
       roomName: null,
       loading: false,
       joinedRoom: false,

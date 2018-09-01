@@ -23,6 +23,7 @@ export default {
     password: 'Password',
     roomUpperLimit: 'Room Upper Limit',
     alreadyFull: 'Already Full',
-    requireNTostartGame : N=>`Require ${N} players to start game`
+    requireNTostartGame : N=>`Require ${N} players to start game`,
+    join: 'Join'
   }
 }
