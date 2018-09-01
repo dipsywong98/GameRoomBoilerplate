@@ -35,8 +35,9 @@ class Game extends Component {
           text: (result.winner?'Winner is ' + result.winner.name:'draw'),
           buttons: [{
             text: 'back',
-            onClick: () => setUiState(2)
-          }]
+            onClick: () => {setUiState(2)}
+          }],
+          onClose: () => {setUiState(2)}
         })
       }
     }

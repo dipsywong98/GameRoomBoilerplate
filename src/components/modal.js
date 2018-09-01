@@ -9,6 +9,7 @@ import withModal from '../lib/with-modal';
 
 class Modal extends Component {
   onClose = () => {
+    if(this.props.modal.onClose)this.props.modal.onClose()
     this.props.setModal({ show: false })
   }
   render() {
