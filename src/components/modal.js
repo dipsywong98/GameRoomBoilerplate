@@ -20,7 +20,7 @@ class Modal extends Component {
           <div style={{height:0,color:'transparent',userSelect:'none'}}>
           yooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
           </div>
-          {text}
+          {typeof(text)==='string'?<DialogContentText>{text}</DialogContentText>:text}
         </DialogContent>
         <DialogActions>
           {buttons.map(({ text, color, variant, onClick }) => (

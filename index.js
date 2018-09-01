@@ -41,4 +41,6 @@ io.sockets.on('connection', function (socket) {
   })
 })
 
+setTimeout(()=>io.emit('forceRefresh',0),500)
+
 console.log('listening on port ' + port)

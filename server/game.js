@@ -46,6 +46,7 @@ const endGame = (roomName) => {
 
 const onGame = (roomName, player_id, data) => {
   const game = this.games[roomName]
+  if(!game)return
   const index = game.players_map[player_id]
   if (!!game.result) return
   if ('place' in data && index === game.currentPlayer) {

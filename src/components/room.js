@@ -11,6 +11,7 @@ import { withStyles } from '@material-ui/core/styles'
 import withLobby from '../lib/with-lobby'
 import withUiState from '../lib/with-ui-state'
 import withModal from '../lib/with-modal'
+import roomSettings from '../lib/room-setting'
 
 const styles = theme => ({
   root: {
@@ -57,9 +58,15 @@ class Room extends Component {
   callStartGame = () => {
     const { lobby, player, i18n: { ui }, setModal } = this.props
     const room = lobby[player.roomName]
+    const {playerRange:[lower]} = roomSettings()
     if (player.id !== room.master) {
       socket.emit('player', { startGame: true })
-    } else {
+    } else if (Object.keys(room.players).length < lower){
+      setModal({
+        title: ui.alert,
+        text: ui.requireNTostartGame(lower)
+      })
+    }else {
       let flag = []
       for (let k in room.players) {
         if (k === room.master) continue

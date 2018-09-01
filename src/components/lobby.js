@@ -11,6 +11,7 @@ import withUiState from '../lib/with-ui-state'
 import NewRoomForm from './new-room-form'
 import withModal from '../lib/with-modal';
 import roomSettings from '../lib/room-setting'
+import { sha3_512 } from 'js-sha3'
 
 const styles = theme => ({
   root: {
@@ -43,6 +44,7 @@ const styles = theme => ({
   card: {
     maxWidth: 200,
     padding: 10,
+    margin: 8,
     margin: 'auto'
   }
 });
@@ -54,35 +56,66 @@ class Lobby extends Component {
   }
   requestCreateRoom = () => {
     const { roomName: name } = this.state
-    const { player, i18n:{ui}, setModal } = this.props
+    const { player, i18n: { ui }, setModal } = this.props
     console.log('request create room')
     setModal({
       title: ui.create,
-      text: (<NewRoomForm onChange={options=>this.setState({options})}/>),
+      text: (<NewRoomForm onChange={options => this.setState({ options })} />),
       buttons: [{
         text: ui.create,
-        onClick: ()=>{
-          const {options} = this.state
-          const {playerRange:[lower,upper]} = roomSettings()
-          if(!options.name) {
+        onClick: () => {
+          const { options } = this.state
+          const { playerRange: [lower, upper] } = roomSettings()
+          if (!options.name) {
             window.alert('Room Name is Required')
             return 1
           }
-          if(options.upperLimit<lower || options.upperLimit>upper){
+          if (options.upperLimit < lower || options.upperLimit > upper) {
             window.alert('Invalid Upperlimit')
             return 1
           }
+          if (options.password) options.password = sha3_512(options.password)
           socket.emit('createRoom', options)
         }
-      },{
+      }, {
         text: 'cancel'
       }]
     })
-    
+
   }
   requestJoinRoom = (room) => {
-    const { player } = this.props
-    socket.emit('player', { roomName: room.name })
+    const { player, setModal, i18n: { ui } } = this.props
+    let password = ''
+    if(Object.keys(room.players).length>=room.upperLimit)return setModal({text:`${ui.room} "${room.name}" ${ui.alreadyFull}`})
+    if (room.password) {
+      setModal({
+        title: ui.password,
+        text: (<div style={{display:'flex',flexDirection:'column'}}>
+          <TextField
+            id="password-input"
+            label={ui.password}
+            type="password"
+            autoComplete="current-password"
+            margin="normal"
+            onChange={({ target: { value } }) => password = value}
+          />
+        </div>),
+        buttons: [{
+          text: 'Join',
+          onClick: () => {
+            const sha_password = sha3_512(password)
+            if (room.password !== sha_password) {
+              window.alert('incorrect password')
+              return 1
+            } else {
+              socket.emit('player', { roomName: room.name, password: sha_password })
+            }
+          }
+        }]
+      })
+    } else {
+      socket.emit('player', { roomName: room.name })
+    }
   }
   leaveRoom = () => {
     socket.emit('player', { roomName: '' })
@@ -125,10 +158,10 @@ class Lobby extends Component {
             <Card className={classes.card} key={room.name} onClick={() => this.requestJoinRoom(room)}>
               <Grid container justify='space-between'>
                 <Grid item>
-                  <Typography>{room.name}</Typography>
+                  <Typography>{room.name}{room.password && '(password)'}</Typography>
                 </Grid>
                 <Grid>
-                  <Typography>{Object.keys(room.players).length}</Typography>
+                  <Typography>{Object.keys(room.players).length}{room.upperLimit&&'/'+room.upperLimit}</Typography>
                 </Grid>
               </Grid>
             </Card>

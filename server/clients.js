@@ -31,9 +31,10 @@ const onPlayer = (id, data)=>{
   if('roomName' in data){
     if(data.roomName !== ''){
       try{
+        const password = data.password || ''
         console.log(id+' joinroom')
         leaveRoom(client)
-        joinRoom(client,data.roomName)
+        joinRoom(client,data.roomName,password)
         client.emit('player',{roomName:data.roomName})
         client.roomName = data.roomName
       }catch(e){

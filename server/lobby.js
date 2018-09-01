@@ -28,21 +28,25 @@ const createRoom = (player, options) => {
     players: {},
     created: Date.now(),
     started: null,
-    master: player.id
+    master: player.id,
+    password: options.password || '',
+    upperLimit: Math.min(options.upperLimit, roomSettings().playerRange[1])
   }
   this.rooms[newRoom.name] = newRoom
   console.log(player.id+' createdroom '+name)
-  return joinRoom(player, name)
+  return joinRoom(player, name, options.password)
 }
 
-const joinRoom = (player, roomName) => {
+const joinRoom = (player, roomName, password) => {
   if (roomName in this.rooms) {
     const room = this.rooms[roomName]
+    if(Object.keys(room.players).length >= room.upperLimit)throw `room ${roomName} is already full`
+    if(room.password !== '' && password !== room.password)throw 'incorrect password'
     room.players[player.id] = {name:player.name, ready: false}
     this.io.emit('lobby', room)
     console.log(player.id+' joinroom '+roomName)
     return room
-  } else createRoom(player,{name:roomName})//throw 'no such game room'
+  } else throw 'no such game room'
 }
 
 const leaveRoom = (player) => {

@@ -11,6 +11,8 @@ socket.on('connect',()=>{
   console.log('socket id',id)
 })
 
+socket.on('forceRefresh',()=>window.location.href = window.location.href)
+
 socket.on('alert',string=>window.alert(string))
 
 const on = (channel, callback) => socket.on(channel,callback)

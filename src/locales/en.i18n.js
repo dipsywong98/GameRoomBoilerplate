@@ -21,6 +21,8 @@ export default {
     players: 'Players',
     player: 'Player',
     password: 'Password',
-    roomUpperLimit: 'Room Upper Limit'
+    roomUpperLimit: 'Room Upper Limit',
+    alreadyFull: 'Already Full',
+    requireNTostartGame : N=>`Require ${N} players to start game`
   }
 }
