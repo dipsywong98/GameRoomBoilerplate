@@ -19,6 +19,8 @@ export default {
     alert: 'Alert',
     are_not_ready: 'are not ready',
     players: 'Players',
-    player: 'Player'
+    player: 'Player',
+    password: 'Password',
+    roomUpperLimit: 'Room Upper Limit'
   }
 }

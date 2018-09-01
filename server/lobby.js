@@ -1,5 +1,10 @@
 const {socketById} = require('./helpers')
 
+const roomSettings = ()=>({
+  canPassword: true,
+  playerRange: [2,2]  //-1 means no limit
+})
+
 const init = (app, io) => {
   this.app = app
   this.io = io
@@ -8,6 +13,9 @@ const init = (app, io) => {
   this.text = 'hello'
   app.get('/gamerooms', (req, res) => {
     res.send(this.rooms)
+  })
+  app.get('/roomSettings', (req, res) => {
+    res.send(roomSettings())
   })
   exports.io = this.io
 }

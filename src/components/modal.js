@@ -17,7 +17,7 @@ class Modal extends Component {
       <Dialog open={show} onClose={this.onClose}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
-          <div style={{height:0,color:'transparent'}}>
+          <div style={{height:0,color:'transparent',userSelect:'none'}}>
           yooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
           </div>
           {text}
@@ -25,8 +25,13 @@ class Modal extends Component {
         <DialogActions>
           {buttons.map(({ text, color, variant, onClick }) => (
             <Button key={text} color={color} variant={variant} onClick={() => {
-              onClick && onClick()
-              this.onClose()
+              if(onClick){
+                if(!onClick()){
+                  this.onClose()
+                }
+              }else this.onClose()
+              // onClick && (flag=onClick())
+              // (!flag) && this.onClose()
             }}>
               {text}
             </Button>

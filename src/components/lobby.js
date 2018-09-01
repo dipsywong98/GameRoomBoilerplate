@@ -8,6 +8,9 @@ import { withi18n } from '../lib/i18n'
 import { withStyles } from '@material-ui/core/styles'
 import withLobby from '../lib/with-lobby'
 import withUiState from '../lib/with-ui-state'
+import NewRoomForm from './new-room-form'
+import withModal from '../lib/with-modal';
+import roomSettings from '../lib/room-setting'
 
 const styles = theme => ({
   root: {
@@ -46,12 +49,36 @@ const styles = theme => ({
 
 class Lobby extends Component {
   state = {
-    roomName: ''
+    roomName: '',
+    options: {}
   }
   requestCreateRoom = () => {
     const { roomName: name } = this.state
-    const { player } = this.props
-    socket.emit('createRoom', { name })
+    const { player, i18n:{ui}, setModal } = this.props
+    console.log('request create room')
+    setModal({
+      title: ui.create,
+      text: (<NewRoomForm onChange={options=>this.setState({options})}/>),
+      buttons: [{
+        text: ui.create,
+        onClick: ()=>{
+          const {options} = this.state
+          const {playerRange:[lower,upper]} = roomSettings()
+          if(!options.name) {
+            window.alert('Room Name is Required')
+            return 1
+          }
+          if(options.upperLimit<lower || options.upperLimit>upper){
+            window.alert('Invalid Upperlimit')
+            return 1
+          }
+          socket.emit('createRoom', options)
+        }
+      },{
+        text: 'cancel'
+      }]
+    })
+    
   }
   requestJoinRoom = (room) => {
     const { player } = this.props
@@ -69,11 +96,11 @@ class Lobby extends Component {
           <Grid>
             <Typography variant="display3">{ui.lobby}</Typography>
           </Grid>
-          <Grid item style={{ margin: "8px" }}>
+          {/* <Grid item style={{ margin: "8px" }}>
             <TextField
               label={ui.enterRoomName}
               onChange={({ target: { value: roomName } }) => this.setState({ roomName })} />
-          </Grid>
+          </Grid> */}
           <Grid container spacing={8} alignItems='baseline' justify='center'>
             <Grid item style={{ margin: "8px" }}>
               <Button
@@ -113,4 +140,4 @@ class Lobby extends Component {
   }
 }
 
-export default withUiState(withLobby(withStyles(styles)(withi18n(withGame(withPlayer(Lobby))))))
+export default withModal(withUiState(withLobby(withStyles(styles)(withi18n(withGame(withPlayer(Lobby)))))))
