@@ -24,6 +24,9 @@ export default {
     roomUpperLimit: 'Room Upper Limit',
     alreadyFull: 'Already Full',
     requireNTostartGame : N=>`Require ${N} players to start game`,
-    join: 'Join'
+    join: 'Join',
+    areYouSureToKick: name => `Are you sure to kick "${name}" out of room?`,
+    yes: 'Yes',
+    no: 'No'
   }
 }

@@ -20,7 +20,8 @@ const colors = ['#FFFFFF', lime[500], yellow[500]]
 const identityEmojis = [
   <Emoji symbol='❌' label='cross' />,
   <Emoji symbol='✔️' label='tick' />,
-  <Emoji symbol='👑' label='crown' />
+  <Emoji symbol='👑' label='crown' />,
+  ' '
 ]
 
 const styles = theme => ({
@@ -100,6 +101,18 @@ class Room extends Component {
       }
     }
   }
+  kick = (kid, name) => {
+    const { setModal, i18n: { ui } } = this.props
+    setModal({
+      text: ui.areYouSureToKick(name),
+      buttons: [{
+        text: ui.yes,
+        onClick: () => { socket.emit('player', { kick: kid }) }
+      }, {
+        text: ui.no,
+      }]
+    })
+  }
   /**
    * 
    * @param {socket id of player} player_id
@@ -121,7 +134,7 @@ class Room extends Component {
     const { lobby, player } = this.props
     const room = lobby[player.roomName]
     if (player_id === room.master) return 2
-    return 0 + (player_id === player.id)
+    return (player.id !== room.master) * 4 || (0 + (player_id === player.id))
   }
 
   render() {
@@ -144,7 +157,11 @@ class Room extends Component {
                         <Typography>{name}</Typography>
                       </Grid>
                       <Grid>
-                        <Button>{identityEmojis[this.identity(id)]}</Button>
+                        <Button
+                          disabled={player.id !== room.master && id !== room.master}
+                          onClick={() => player.id === room.master && this.kick(id, name)}>
+                          {identityEmojis[this.identity(id)]}
+                        </Button>
                       </Grid>
                     </Grid>
                   </Card>

@@ -1,8 +1,8 @@
-const {socketById} = require('./helpers')
+const socketById = id => require('./helpers').socketById(this.io, id)
 
 const roomSettings = ()=>({
   canPassword: true,
-  playerRange: [2,2]  //-1 means no limit
+  playerRange: [2,3]  //-1 means no limit
 })
 
 const init = (app, io) => {
@@ -71,17 +71,28 @@ const removeRoom = (roomName) => {
   require('./game').endGame(roomName)
 }
 
+const kick = (roomName, id, kickedPlayer) => {
+  const room = this.rooms[roomName]
+  if(!room)return
+  if(id!=room.master)return
+
+  kickedPlayer.emit('player',{roomName: ''})
+  leaveRoom(kickedPlayer)
+  kickedPlayer.emit('alert','you are kicked by room master')
+}
+
 const getRoom = roomName => this.rooms[roomName]
 
 const roomEmit = (roomName, channel, ...data) => {
   if(roomName in this.rooms){
-    Object.keys(this.rooms[roomName].players).forEach(socketid=>socketById(this.io,socketid).emit(channel, ...data))
+    Object.keys(this.rooms[roomName].players).forEach(socketid=>socketById(socketid).emit(channel, ...data))
   } else {
     console.log(`publish: roomName ${roomName} not exist`)
   }
 }
 
 exports.log = () => console.log(this.text)
+exports.kick = kick
 exports.getRoom = getRoom
 exports.joinRoom = joinRoom
 exports.createRoom = createRoom

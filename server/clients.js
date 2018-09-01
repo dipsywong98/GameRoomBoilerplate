@@ -1,4 +1,4 @@
-const {createRoom,joinRoom,leaveRoom,getRoom,io} = require('./lobby')
+const {createRoom,joinRoom,leaveRoom,getRoom,io,kick} = require('./lobby')
 const {startGame, onGame} = require('./game')
 const socketById = id => require('./helpers').socketById(io, id)
 
@@ -76,6 +76,11 @@ const onPlayer = (id, data)=>{
       room.players[id].ready = !room.players[id].ready
       io.emit('lobby',room)
     }
+  }
+
+  if('kick' in data){
+    const roomName = client.roomName
+    roomName && kick(roomName,id,this.clients[data.kick])
   }
   // this.clients[id] = {...client, ...data}
 }
