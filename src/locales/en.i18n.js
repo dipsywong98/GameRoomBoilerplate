@@ -1,19 +1,24 @@
 export default {
   "name": "English",
   "ui": {
-    welcome:'welcome',
-    enter_your_name:'enter your name',
-    tutorial:'tutorial',
-    play: 'play',
+    welcome:'Welcome',
+    enter_your_name:'Enter Your Name',
+    tutorial:'Tutorial',
+    play: 'Play',
     lobby: 'Lobby',
-    back:'back',
-    help:'help',
+    back:'Back',
+    help:'Help',
     enterRoomName:'Enter Room Name',
     create: 'Create',
     search: 'Search',
     leave: 'Leave',
     start: 'Start',
     room: 'Room',
-    ready: 'Ready'
+    ready: 'Ready',
+    statusNames: ['Not Ready', 'Ready', 'Master'],
+    alert: 'Alert',
+    are_not_ready: 'are not ready',
+    players: 'Players',
+    player: 'Player'
   }
 }

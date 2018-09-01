@@ -17,7 +17,10 @@ class Modal extends Component {
       <Dialog open={show} onClose={this.onClose}>
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
-          <DialogContentText>{text}</DialogContentText>
+          <div style={{height:0,color:'transparent'}}>
+          yooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+          </div>
+          {text}
         </DialogContent>
         <DialogActions>
           {buttons.map(({ text, color, variant, onClick }) => (

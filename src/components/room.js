@@ -10,6 +10,7 @@ import { withi18n } from '../lib/i18n'
 import { withStyles } from '@material-ui/core/styles'
 import withLobby from '../lib/with-lobby'
 import withUiState from '../lib/with-ui-state'
+import withModal from '../lib/with-modal'
 
 const styles = theme => ({
   root: {
@@ -54,12 +55,49 @@ class Room extends Component {
     socket.emit('player', { roomName: '' })
   }
   callStartGame = () => {
-    socket.emit('player',{startGame: true})
+    const { lobby, player, i18n: { ui }, setModal } = this.props
+    const room = lobby[player.roomName]
+    if (player.id !== room.master) {
+      socket.emit('player', { startGame: true })
+    } else {
+      let flag = []
+      for (let k in room.players) {
+        if (k === room.master) continue
+        if (!room.players[k].ready) {
+          flag.push(room.players[k].name)
+        }
+      }
+      if (flag.length === 0) {
+        socket.emit('player', { startGame: true })
+      } else {
+        setModal({
+          title: ui.alert,
+          text: (<div>
+            <Typography>{ui.players}</Typography>
+            <ul>
+              {flag.map(name => <li key={name}>{name}</li>)}
+            </ul>
+            <Typography>{ui.are_not_ready}</Typography>
+          </div>)
+        })
+      }
+    }
+  }
+  /**
+   * 
+   * @param {socket id of player} player_id
+   * @return {status} 0: not ready, 1: ready, 2: master
+   */
+  playerStatus(player_id) {
+    const { lobby, player } = this.props
+    const room = lobby[player.roomName]
+    if (player_id === room.master) return 2
+    return 0 + room.players[player_id].ready
   }
   render() {
-    const { i18n: { ui }, classes, player } = this.props
-    const room = this.props.lobby[this.props.player.roomName]
-    if(!room)return <Typography>LOADING</Typography>
+    const { i18n: { ui }, classes, player, lobby } = this.props
+    const room = lobby[player.roomName]
+    if (!room) return <Typography>LOADING</Typography>
     return (
       <div className={classes.root}>
         <Grid item style={{ margin: 'auto' }}>
@@ -68,15 +106,15 @@ class Room extends Component {
               <Typography variant="display3">{ui.room}: {room.name}</Typography>
             </Grid>
             <Grid container direction='column' justify='center'>
-              {(Object.keys(room.players).map(id=>({id,...room.players[id]})).map(({id,name, ready}) => (
-                <Grid style={{ margin: "8px" }} key={name} item>
+              {(Object.keys(room.players).map(id => ({ id, ...room.players[id] })).map(({ id, name }) => (
+                <Grid style={{ margin: "8px" }} key={id} item>
                   <Card className={classes.card}>
                     <Grid container justify='space-between'>
                       <Grid item>
                         <Typography>{name}</Typography>
                       </Grid>
                       <Grid>
-                        <Typography>{(id===room.master?'master':(ready?'ready':'not ready'))}</Typography>
+                        <Typography>{ui.statusNames[this.playerStatus(id)]}</Typography>
                       </Grid>
                     </Grid>
                   </Card>
@@ -88,7 +126,7 @@ class Room extends Component {
                 <Button variant='raised' color='secondary' onClick={this.leaveRoom}>{ui.leave}</Button>
               </Grid>
               <Grid style={{ margin: "8px" }} item>
-                <Button variant='raised' color='primary' onClick={this.callStartGame}>{(player.id === room.master?ui.start:ui.ready)}</Button>
+                <Button variant='raised' color='primary' onClick={this.callStartGame}>{(player.id === room.master ? ui.start : ui.ready)}</Button>
               </Grid>
             </Grid>
           </Grid>
@@ -98,4 +136,4 @@ class Room extends Component {
   }
 }
 
-export default withUiState(withLobby(withStyles(styles)(withi18n(withGame(withPlayer(Room))))))
+export default withModal(withUiState(withLobby(withStyles(styles)(withi18n(withGame(withPlayer(Room)))))))
