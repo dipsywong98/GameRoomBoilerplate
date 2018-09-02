@@ -22,7 +22,7 @@ class App extends Component {
     window.onload = ()=>this.setState({loading: false})
   }
   render() {
-    if(this.state.loading)return <div style={{paddingTop:'20em',textAlign:'center'}}><Typography>LOADING...</Typography></div>
+    if(this.state.loading)return <div style={{position:'absolute', top:'50%', left: '50%'}}><Typography>LOADING...</Typography></div>
     return (<Provider store={store} children={this.props.children}/>)
   }
 }
