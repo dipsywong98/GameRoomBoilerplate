@@ -114,8 +114,8 @@ class ChatRoom extends Component {
                   textColor="primary"
                   fullWidth
                 >
-                  <Tab label="lobby" />
-                  <Tab label={roomName} />
+                  <Tab label="lobby" style={{ width: '50%', minWidth: 0 }} />
+                  <Tab label={roomName} style={{ width: '50%', minWidth: 0 }} />
                 </Tabs>
                 }
                 <SwipeableViews
@@ -133,26 +133,28 @@ class ChatRoom extends Component {
                         </List>
                       </Grid>
                     </TabContainer>))}
-                  <div style={{ float:"left", clear: "both" }}
-                      ref={(el) => { this.messagesEnd = el; }}>
+                  <div style={{ float: "left", clear: "both" }}
+                    ref={(el) => { this.messagesEnd = el; }}>
                   </div>
                 </SwipeableViews>
-                <Grid item className={classes.inputWrap}>
-                  <Input
-                    placeholder="New Message"
-                    inputProps={{
-                      'aria-label': 'Description',
-                    }}
-                    onChange={this.handleInput}
-                    onFocus={() => this.setState({ focus: true })}
-                    onBlur={() => this.setState({ focus: false })}
-                    value={message}
-                    style={{margin: 8, width: 182}}
-                  />
-                  <IconButton color='primary' onClick={this.handleSend}>
-                    <Send />
-                  </IconButton >
-                </Grid>
+                <Paper elevation={4}>
+                  <Grid item className={classes.inputWrap}>
+                    <Input
+                      placeholder="New Message"
+                      inputProps={{
+                        'aria-label': 'Description',
+                      }}
+                      onChange={this.handleInput}
+                      onFocus={() => this.setState({ focus: true })}
+                      onBlur={() => this.setState({ focus: false })}
+                      value={message}
+                      style={{ margin: 8, width: 182 }}
+                    />
+                    <IconButton color='primary' onClick={this.handleSend}>
+                      <Send />
+                    </IconButton >
+                  </Grid>
+                </Paper>
               </Grid>
             </Collapse>
           </Grid>
