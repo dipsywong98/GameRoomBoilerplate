@@ -167,7 +167,6 @@ class Lobby extends Component {
             </Card>
           ))}
         </Grid>
-        <ChatRoom channel="lobby" name={this.props.player.name}></ChatRoom>
       </div>
     )
   }

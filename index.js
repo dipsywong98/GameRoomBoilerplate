@@ -35,7 +35,7 @@ app.get('*.*', function (req, res) {
 
 io.sockets.on('connection', function (socket) {
   clients.newClient(socket)
-  socket.on('chatRoom/lobby', function (data) {
+  socket.on('chatRoom', function (data) {
     console.log(data)
     io.sockets.emit('chatRoom', data)
   })

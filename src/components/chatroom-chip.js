@@ -30,30 +30,35 @@ const styles = theme => ({
 
 const Chip = ({ name, message, time, classes, me = false }) => {
   let colorHash = new ColorHash(), color = colorHash.hex(btoa(name))
-  return (
-    <ListItem className={(me?classes.chipMe:classes.chip)}>
-      <Grid direction='column' alignItems='stretch' container>
-        <Grid item>
+
+  if (me) {
+    return (
+      <ListItem className={classes.chipMe}>
+        <Grid direction='column' alignItems='stretch' container wrap='nowrap'>
+          <Typography variant='subheading' style={{wordWrap:'break-word'}}>{message}</Typography>
+          <abbr title={moment(time).format('YYYY-MM-DD HH:mm:ss')} style={{ textDecoration: 'none' }}>
+            <Typography variant='caption'>{moment(time).format('HH:mm')}</Typography>
+          </abbr>
+        </Grid>
+      </ListItem>
+    )
+  } else {
+    return (
+      <ListItem className={classes.chip}>
+        <Grid direction='column' alignItems='stretch' container wrap='nowrap'>
           <Grid container justify='space-between' alignItems='baseline'>
-            <Grid item>
-              {(me
-                ? <Typography variant='subheading'>{message}</Typography>
-                : <Typography variant='body2' style={{ color }}>{name}</Typography>)}
-            </Grid>
+            <Typography variant='body2' style={{ color }}>{name}</Typography>
             <Grid item>
               <abbr title={moment(time).format('YYYY-MM-DD HH:mm:ss')} style={{ textDecoration: 'none' }}>
                 <Typography variant='caption'>{moment(time).format('HH:mm')}</Typography>
               </abbr>
             </Grid>
           </Grid>
+          <Typography variant='subheading' style={{wordWrap:'break-word'}}>{message}</Typography>
         </Grid>
-        {(!me &&
-          <Grid item>
-            <Typography variant='subheading'>{message}</Typography>
-          </Grid>)}
-      </Grid>
-    </ListItem>
-  )
+      </ListItem>
+    )
+  }
 }
 
 export default withStyles(styles)(Chip)

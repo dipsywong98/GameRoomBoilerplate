@@ -2,7 +2,7 @@ const socketById = id => require('./helpers').socketById(this.io, id)
 
 const roomSettings = ()=>({
   canPassword: true,
-  playerRange: [2,3]  //-1 means no limit
+  playerRange: [2,2]  //-1 means no limit
 })
 
 const init = (app, io) => {

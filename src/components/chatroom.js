@@ -5,6 +5,12 @@ import { withStyles } from '@material-ui/core/styles'
 import socket from '../lib/socket-client-helper'
 import Send from './svg/send'
 import Chip from './chatroom-chip'
+import withPlayer from '../lib/with-player'
+import SwipeableViews from 'react-swipeable-views';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+import Typography from '@material-ui/core/Typography';
 
 const styles = theme => ({
   frame: {
@@ -23,28 +29,37 @@ const styles = theme => ({
     overflowY: 'scroll'
   },
   inputWrap: {
-    borderTop: ''
+    display: 'flex',
+    justifyContent: 'space-between'
   }
 })
 
+function TabContainer({ children, dir }) {
+  return (
+    <div>
+      {children}
+    </div>
+  );
+}
+
 class ChatRoom extends Component {
   state = {
-    messages: [],
+    messages: { lobby: [] },
     message: '',
     cursor: 0,
     collapse: true,
     oldIsr: null,
-    focus: false
+    focus: false,
+    tab: 0
   }
-  onReceiveMessage = (message)=>{
-    const {messages} = this.state
-    messages.push(message)
-    this.setState({messages})
+  onReceiveMessage = ([channel, message]) => {
+    const { messages } = this.state
+    if (!(channel in messages)) messages[channel] = []
+    messages[channel].push(message)
+    this.setState({ messages })
   }
   componentWillMount() {
-    const { channel } = this.props
-    console.log(`subsribe to ${channel}`)
-    socket.on(`chatRoom/lobby`, this.onReceiveMessage)
+    socket.on(`chatRoom`, this.onReceiveMessage)
     // dbon(`rooms/${channel}/chat`, 'value', value => this.setState({
     //   messages: value && value.messages && value.messages.sort((a,b)=>a.time-b.time) || [],
     //   cursor: value && value.cursor || 0
@@ -52,35 +67,35 @@ class ChatRoom extends Component {
     this.state.oldIsr = window.onkeyup
     window.onkeyup = e => {
       const key = e.keyCode ? e.keyCode : e.which
-      if(key===13) this.state.focus && this.handleSend()
+      if (key === 13) this.state.focus && this.handleSend()
     }
   }
   componentWillUnmount() {
     window.onkeyup = this.state.oldIsr
     // dboff(`rooms/${this.props.channel}/chat`, 'value')
-    socket.removeAllListeners(`chatRoom/lobby`)
+    socket.removeAllListeners(`chatRoom`)
   }
-  componentWillReceiveProps(nextProps) {
-    socket.removeAllListeners(`rooms/${this.props.channel}/chat`)
-    console.log(`unsubsribe to ${this.props.channel} and subscribe to ${nextProps.channel}`)
-    socket.on(`rooms/${nextProps.channel}/chat`, this.onReceiveMessage)
-  }
-  
+
   handleInput = ({ target: { value } }) => {
     this.setState({ message: value })
   }
+
   handleSend = () => {
-    const { channel, name } = this.props
-    let { messages, message, cursor } = this.state
-    if(message === '') return
-    const newMessage = { time: Date.now(), name, message }
+    const { player: { name, roomName, id } } = this.props
+    let { messages, message, cursor, tab } = this.state
+    if (message === '') return
+    const newMessage = { time: Date.now(), name: name || this.props.name, message, id }
     this.setState({ message: '' })
-    socket.emit(`chatRoom/lobby`, newMessage)
+
+    socket.emit(`chatRoom`, [['lobby', roomName][tab], newMessage])
   }
+  handleTabChange = (_, tab) => this.setState({ tab })
+  handleSwipeTab = tab => this.setState({ tab })
   render() {
-    const { classes, name } = this.props
+    const { classes, theme, player: { roomName, name, id } } = this.props
     const chatRoomTitle = this.props.chatRoomTitle || 'chatroom'
     const { message, messages, collapse } = this.state
+    if (!roomName && this.state.tab !== 0) this.setState({ tab: 0 })
     return (
       <Grid container direction='column' className={classes.frame}>
         <Paper elevation={16}>
@@ -92,13 +107,36 @@ class ChatRoom extends Component {
           <Grid item>
             <Collapse in={!collapse}>
               <Grid container direction='column' className={classes.inner} justify='flex-end'>
-                <Grid item className={classes.messageContainer}>
-                  <List>
-                    {messages.map(({ name, message, time }) => (
-                      <Chip name={name} message={message} time={time} me={name === this.props.name}/>
-                    ))}
-                  </List>
-                </Grid>
+                {roomName && <Tabs
+                  value={this.state.tab}
+                  onChange={this.handleTabChange}
+                  indicatorColor="primary"
+                  textColor="primary"
+                  fullWidth
+                >
+                  <Tab label="lobby" />
+                  <Tab label={roomName} />
+                </Tabs>
+                }
+                <SwipeableViews
+                  axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                  index={this.state.tab}
+                  onChangeIndex={this.handleSwipeTab}
+                >
+                  {((roomName && ['lobby', roomName]) || ['lobby']).map(context => (
+                    <TabContainer dir={theme.direction}>
+                      <Grid item className={classes.messageContainer}>
+                        <List>
+                          {messages[context] && messages[context].map(({ name, message, time, id: mid }) => (
+                            <Chip name={name} message={message} time={time} me={id === mid} />
+                          ))}
+                        </List>
+                      </Grid>
+                    </TabContainer>))}
+                  <div style={{ float:"left", clear: "both" }}
+                      ref={(el) => { this.messagesEnd = el; }}>
+                  </div>
+                </SwipeableViews>
                 <Grid item className={classes.inputWrap}>
                   <Input
                     placeholder="New Message"
@@ -106,9 +144,10 @@ class ChatRoom extends Component {
                       'aria-label': 'Description',
                     }}
                     onChange={this.handleInput}
-                    onFocus={()=>this.setState({focus: true})}
-                    onBlur={()=>this.setState({focus: false})}
+                    onFocus={() => this.setState({ focus: true })}
+                    onBlur={() => this.setState({ focus: false })}
                     value={message}
+                    style={{margin: 8, width: 182}}
                   />
                   <IconButton color='primary' onClick={this.handleSend}>
                     <Send />
@@ -128,8 +167,8 @@ ChatRoom.propTypes = {
 }
 
 ChatRoom.defaultProps = {
-  name: 'guest '+Math.floor(Math.random()*1000),
+  name: 'guest ' + Math.floor(Math.random() * 1000),
   channel: '__global__'
 }
 
-export default withStyles(styles)(ChatRoom)
+export default withPlayer(withStyles(styles, { withTheme: true })(ChatRoom))

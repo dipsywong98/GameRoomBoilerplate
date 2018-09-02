@@ -8,6 +8,7 @@ import Room from './room'
 import withGame from '../lib/with-game'
 import withUiState from '../lib/with-ui-state'
 import Modal from './modal'
+import Chatroom from './chatroom';
 
 class _Page extends React.Component {
   render() {
@@ -16,6 +17,7 @@ class _Page extends React.Component {
       <div>
         <Modal />
         <Element />
+        <Chatroom />
       </div>
     )
   }
